@@ -1,0 +1,2581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthCheck AI - Your Wellness Dashboard</title>
+    <style>
+        /* ============================================
+           CSS VARIABLES - Customize theme colors here
+           Change these values to modify the entire theme
+           ============================================ */
+        :root {
+            --primary-bg: #0d1117;
+            --secondary-bg: #161b22;
+            --card-bg: rgba(22, 27, 34, 0.8);
+            --accent-color: #4dd0e1;
+            --accent-hover: #26c6da;
+            --text-primary: #e6edf3;
+            --text-secondary: #b3b8c0;
+            --border-color: rgba(77, 208, 225, 0.3);
+            --shadow-glow: rgba(77, 208, 225, 0.3);
+        }
+
+        /* HOW TO CLEAR LOCALSTORAGE:
+           Open browser console (F12) and type: localStorage.clear()
+           Or use the "Delete All Data" button at the bottom of the page
+        */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--primary-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* ============================================
+           NAVBAR
+           ============================================ */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(13, 17, 23, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo {
+            /* font-size: 30px;
+            font-weight: 700;
+            color: var(--accent-color);
+            text-shadow: 0 0 20px var(--shadow-glow); */
+            font-size: 30px;
+            font-weight: 700;
+            color: #4dd0e1;
+            text-shadow: 0 0 20px rgba(77, 208, 225, 0.6); 
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-color);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-color);
+            transition: width 0.3s;
+            box-shadow: 0 0 10px var(--accent-color);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* ============================================
+           HERO SECTION - Visible on load with animation
+           ============================================ */
+        .hero {
+            min-height: 50vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 8rem 5% 4rem;
+            scroll-margin-top: 80px;
+            background: linear-gradient(135deg, rgba(77, 208, 225, 0.1), rgba(13, 17, 23, 0.9));
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            animation: heroFadeIn 1s ease-out forwards;
+        }
+
+        @keyframes heroFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(77, 208, 225, 0.3), transparent);
+            border-radius: 50%;
+            top: -200px;
+            right: -200px;
+            animation: pulse 4s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+            text-shadow: 0 0 30px var(--shadow-glow);
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-cta {
+            padding: 1rem 2.5rem;
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+            border: none;
+            border-radius: 30px;
+            color: var(--primary-bg);
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0 30px var(--shadow-glow);
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-cta:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 40px var(--shadow-glow);
+        }
+
+        /* ============================================
+           SECTIONS
+           ============================================ */
+        section {
+            padding: 3rem 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+            scroll-margin-top: 80px;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: var(--accent-color);
+            text-align: center;
+            text-shadow: 0 0 20px var(--shadow-glow);
+        }
+
+        /* ============================================
+           AVATAR / HEALTH BUDDY
+           ============================================ */
+        .avatar-section {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: slideIn 0.8s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .avatar {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 1rem;
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            animation: avatarBounce 2s infinite;
+            box-shadow: 0 0 30px var(--shadow-glow);
+        }
+
+        @keyframes avatarBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .avatar:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .speech-bubble {
+            background: rgba(77, 208, 225, 0.1);
+            border: 1px solid var(--accent-color);
+            border-radius: 15px;
+            padding: 1rem 1.5rem;
+            margin: 1rem auto;
+            max-width: 600px;
+        }
+
+        .name-input-group {
+            margin-top: 1rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .name-input {
+            padding: 0.8rem 1.5rem;
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .name-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 10px var(--shadow-glow);
+        }
+
+        /* ============================================
+           CHAT / AI DOCTOR
+           ============================================ */
+        .chat-container {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: -37px;
+        }
+
+        .chat-messages {
+            height: 200px;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: rgba(13, 17, 23, 0.5);
+            border-radius: 10px;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: var(--accent-color);
+            border-radius: 10px;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 10px;
+            max-width: 80%;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-message {
+            background: rgba(77, 208, 225, 0.2);
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .ai-message {
+            background: rgba(77, 208, 225, 0.1);
+            border-left: 3px solid var(--accent-color);
+        }
+
+        .disclaimer {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-style: italic;
+            margin-top: 0.5rem;
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 1rem;
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-family: inherit;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 10px var(--shadow-glow);
+        }
+
+        /* ============================================
+           BUTTONS
+           ============================================ */
+        .btn {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+            border: none;
+            border-radius: 10px;
+            color: var(--primary-bg);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0 20px var(--shadow-glow);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 25px var(--shadow-glow);
+        }
+
+        .btn-secondary {
+            background: var(--secondary-bg);
+            color: var(--accent-color);
+            border: 1px solid var(--accent-color);
+        }
+
+        /* ============================================
+           WELLNESS GRID
+           ============================================ */
+        .wellness-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .wellness-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wellness-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(77, 208, 225, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .wellness-card:hover::before {
+            opacity: 1;
+        }
+
+        .wellness-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px var(--shadow-glow);
+            border-color: var(--accent-color);
+        }
+
+        .wellness-card .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .wellness-card h3 {
+            color: var(--accent-color);
+            margin-bottom: 0.5rem;
+        }
+
+        /* ============================================
+           MENTAL WELLBEING TABS
+           ============================================ */
+        .wellbeing-tabs {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 1rem 2rem;
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active, .tab-btn:hover {
+            background: rgba(77, 208, 225, 0.2);
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px var(--shadow-glow);
+        }
+
+        .tab-content {
+            display: none;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        .breathing-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: rgba(77, 208, 225, 0.3);
+            margin: 2rem auto;
+            animation: breathe 8s infinite;
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.3); }
+            50% { transform: scale(1); }
+        }
+
+        .timer-display {
+            font-size: 3rem;
+            color: var(--accent-color);
+            margin: 2rem 0;
+        }
+
+        /* ============================================
+           SYMPTOM CHECKER
+           ============================================ */
+        .symptom-checker {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 2rem;
+        }
+
+        .symptom-tags {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin: 1.5rem 0;
+        }
+
+        .symptom-tag {
+            padding: 0.7rem 1.5rem;
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .symptom-tag:hover,
+        .symptom-tag.selected {
+            background: rgba(77, 208, 225, 0.2);
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        .progress-stepper {
+            display: flex;
+            justify-content: space-between;
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .progress-stepper::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--border-color);
+            z-index: 0;
+        }
+
+        .step {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--secondary-bg);
+            border: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step.active {
+            background: var(--accent-color);
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px var(--shadow-glow);
+        }
+
+        .question-container {
+            background: rgba(77, 208, 225, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 1.5rem 0;
+        }
+
+        /* ============================================
+           MEDICINE REMINDER
+           ============================================ */
+        .reminder-form {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 10px var(--shadow-glow);
+        }
+
+        .reminder-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .reminder-item {
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .reminder-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .icon-btn {
+            background: transparent;
+            border: none;
+            color: var(--accent-color);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .icon-btn:hover {
+            transform: scale(1.2);
+        }
+
+        /* ============================================
+           HEALTH SCORE
+           ============================================ */
+        .health-score-container {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .score-ring {
+            width: 200px;
+            height: 200px;
+            margin: 2rem auto;
+            position: relative;
+        }
+
+        .score-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+
+        .score-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        /* ============================================
+           INSIGHTS
+           ============================================ */
+        .insight-card {
+            background: linear-gradient(135deg, rgba(77, 208, 225, 0.1), var(--card-bg));
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .insight-text {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .saved-tips {
+            display: grid;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .saved-tip {
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* ============================================
+           WEARABLE DEVICES
+           ============================================ */
+        .wearable-section {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .smartwatch-icon {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .smartwatch-icon:hover {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 20px var(--accent-color));
+        }
+
+        .wearable-data {
+            display: none;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .wearable-data.active {
+            display: grid;
+            animation: fadeIn 0.5s;
+        }
+
+        .data-item {
+            background: rgba(77, 208, 225, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .data-value {
+            font-size: 2rem;
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        /* ============================================
+           HOSPITAL LIST
+           ============================================ */
+        .hospital-list {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .hospital-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 1.5rem;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 1.5rem;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .hospital-card:hover {
+            border-color: var(--accent-color);
+            box-shadow: 0 10px 30px var(--shadow-glow);
+        }
+
+        .hospital-icon {
+            font-size: 3rem;
+        }
+
+        .hospital-info h3 {
+            color: var(--accent-color);
+            margin-bottom: 0.5rem;
+        }
+
+        /* ============================================
+           PRIVACY & FEEDBACK
+           ============================================ */
+        .privacy-box, .feedback-form {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .rating-stars {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1rem 0;
+            font-size: 2rem;
+        }
+
+        .star {
+            cursor: pointer;
+            transition: all 0.3s;
+            filter: grayscale(100%);
+        }
+
+        .star:hover,
+        .star.active {
+            filter: grayscale(0%);
+            transform: scale(1.2);
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 50px;
+            padding: 1rem;
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 10px var(--shadow-glow);
+        }
+
+        /* ============================================
+           MODAL
+           ============================================ */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-content {
+            background: var(--primary-bg);
+            border: 2px solid var(--accent-color);
+            border-radius: 15px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 0 50px var(--shadow-glow);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .close-btn {
+            float: right;
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--accent-color);
+            background: none;
+            border: none;
+        }
+
+        .close-btn:hover {
+            transform: rotate(90deg);
+        }
+
+        /* ============================================
+           TOAST NOTIFICATION
+           ============================================ */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--card-bg);
+            border: 1px solid var(--accent-color);
+            border-radius: 15px;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 10px 40px var(--shadow-glow);
+            z-index: 3000;
+            animation: slideInRight 0.3s;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(77, 208, 225, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-color), var(--accent-hover));
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .wellness-grid, .hospital-list {
+                grid-template-columns: 1fr;
+            }
+
+            .chat-input-area {
+                flex-direction: column;
+            }
+
+            section {
+                padding: 2rem 5%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="logo">Bharat Care AI</div>
+        <ul class="nav-links">
+            <li><a href="home.html">Home</a></li>
+            <li><a href="mytest.html" class="active">My Heath Test</a></li>
+            <li><a href="selfcheck.html">Self Check</a></li>
+            <li><a href="profile.html">Profile</a></li>
+            <li><a href="community.html">Community</a></li>
+        </ul>
+    </nav>
+
+    <!-- 1. HERO SECTION -->
+    <section class="hero" id="home">
+        <h1>Your Personalized Wellness Zone</h1>
+        <p>Discover insights, track health, and connect with AI-powered care — all in one place.</p>
+        <button class="hero-cta" onclick="document.getElementById('avatar').scrollIntoView({behavior: 'smooth'})">
+            Start Your Health Journey
+        </button>
+    </section>
+
+    <!-- 2. AVATAR / HEALTH BUDDY -->
+    <section id="avatar">
+        <div class="avatar-section">
+            <div class="avatar" onclick="avatarSpeak()">🧑‍⚕️</div>
+            <div class="speech-bubble">
+                <strong id="avatarSpeech">Good morning, Friend! Ready for a health checkup?</strong>
+            </div>
+            <div class="name-input-group">
+                <input type="text" id="userName" class="name-input" placeholder="Enter your name" />
+                <button class="btn" onclick="setUserName()">Save Name</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. ASK YOUR AI DOCTOR -->
+    <section id="ai-doctor">
+        <h2 class="section-title">🧠 Ask Your AI Doctor</h2>
+        <div class="chat-container">
+            <div class="chat-messages" id="chatMessages" aria-live="polite">
+                <div class="message ai-message">
+                    <strong>AI Doctor:</strong> Hello! I'm your AI health assistant. I can provide general health information. How can I help you today?
+                    <div class="disclaimer">⚠️ For educational purposes only. Not a substitute for professional medical advice.</div>
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" class="chat-input" id="chatInput" placeholder="Ask a health question..." aria-label="Chat input" />
+                <button class="btn" onclick="sendMessage()">Send</button>
+                <button class="btn btn-secondary" onclick="clearChat()">Clear</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. WELLNESS ZONE
+    <section id="wellness">
+        <h2 class="section-title">🌿 Wellness Zone — Lifestyle Insights</h2>
+        <div class="wellness-grid">
+            <div class="wellness-card" onclick="openWellnessModal('diet')" tabindex="0">
+                <div class="icon">🥗</div>
+                <h3>Diet</h3>
+                <p>Personalized nutrition tips</p>
+            </div>
+            <div class="wellness-card" onclick="openWellnessModal('sleep')" tabindex="0">
+                <div class="icon">💤</div>
+                <h3>Sleep</h3>
+                <p>Sleep analysis & insights</p>
+            </div>
+            <div class="wellness-card" onclick="openWellnessModal('exercise')" tabindex="0">
+                <div class="icon">🏃‍♂️</div>
+                <h3>Exercise</h3>
+                <p>Track your fitness goals</p>
+            </div>
+            <div class="wellness-card" onclick="openWellnessModal('tips')" tabindex="0">
+                <div class="icon">🩺</div>
+                <h3>Health Tips</h3>
+                <p>Daily wellness advice</p>
+            </div>
+        </div>
+    </section> -->
+
+    <!-- 5. MENTAL WELLBEING -->
+    <section id="mental">
+        <h2 class="section-title">🧘 Mental Wellbeing</h2>
+        <div class="wellbeing-tabs">
+            <button class="tab-btn active" onclick="switchTab('yoga')">🧘‍♂️ Yoga</button>
+            <button class="tab-btn" onclick="switchTab('music')">🎵 Music</button>
+            <button class="tab-btn" onclick="switchTab('meditation')">🧘‍♀️ Meditation</button>
+        </div>
+        <div class="tab-content active" id="yoga">
+            <h3>Yoga Session</h3>
+            <p>Start your daily yoga routine for better flexibility and peace of mind</p>
+            <button class="btn" onclick="startYoga()">Start Yoga</button>
+        </div>
+        <div class="tab-content" id="music">
+            <h3>Relaxing Music</h3>
+            <p>Listen to calming sounds to reduce stress and anxiety</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="musicProgress"></div>
+            </div>
+            <p><span id="currentTime">0:00</span> / <span id="totalTime">10:00</span></p>
+            <button class="btn" id="musicBtn" onclick="playMusic()">🎵 Play Music</button>
+        </div>
+        <div class="tab-content" id="meditation">
+            <h3>Guided Meditation</h3>
+            <p>5-minute breathing exercise for mental clarity</p>
+            <div class="breathing-circle"></div>
+            <p id="breathingText" style="font-size: 1.2rem; margin: 1rem 0;">Breathe in... Breathe out...</p>
+            <button class="btn" onclick="startMeditation()">Start Meditation</button>
+        </div>
+    </section>
+
+    <!-- 6. SYMPTOM CHECKER -->
+    <section id="symptom">
+        <h2 class="section-title">🩺 Symptom Checker</h2>
+        <div class="symptom-checker">
+            <p style="margin-bottom: 1rem;">Select your primary symptom or type it below:</p>
+            <div class="symptom-tags">
+                <span class="symptom-tag" onclick="selectSymptom('Headache')">🤕 Headache</span>
+                <span class="symptom-tag" onclick="selectSymptom('Fever')">🤒 Fever</span>
+                <span class="symptom-tag" onclick="selectSymptom('Cough')">😷 Cough</span>
+                <span class="symptom-tag" onclick="selectSymptom('Fatigue')">😫 Fatigue</span>
+                <span class="symptom-tag" onclick="selectSymptom('Nausea')">🤢 Nausea</span>
+                <span class="symptom-tag" onclick="selectSymptom('Pain')">⚡ Pain</span>
+            </div>
+            <input type="text" id="customSymptom" class="name-input" placeholder="Or type your symptom here..." style="width: 100%; margin: 1rem 0;" />
+            <button class="btn" onclick="startSymptomCheck()">Start Assessment</button>
+
+            <div id="symptomQuestions" style="display: none; margin-top: 2rem;">
+                <div class="progress-stepper" id="stepper"></div>
+                <div id="questionArea"></div>
+            </div>
+
+            <div id="symptomResults" style="display: none; margin-top: 2rem;"></div>
+        </div>
+    </section>
+
+    <!-- 7. MEDICINE REMINDER -->
+    <section id="medicine">
+        <h2 class="section-title">💊 Medicine Reminder</h2>
+        <div class="reminder-form">
+            <h3 style="color: var(--accent-color); margin-bottom: 1.5rem;">Add New Reminder</h3>
+            <div class="form-group">
+                <label for="medName">Medicine Name</label>
+                <input type="text" id="medName" placeholder="e.g., Aspirin" />
+            </div>
+            <div class="form-group">
+                <label for="medDose">Dosage</label>
+                <input type="text" id="medDose" placeholder="e.g., 500mg" />
+            </div>
+            <div class="form-group">
+                <label for="medTimes">Times per day</label>
+                <input type="number" id="medTimes" min="1" max="6" value="1" onchange="updateTimeInputs()" />
+            </div>
+            <div id="timeInputsContainer">
+                <div class="form-group">
+                    <label for="medTime1">Time 1</label>
+                    <input type="time" id="medTime1" value="08:00" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="medStart">Start Date</label>
+                <input type="date" id="medStart" />
+            </div>
+            <div class="form-group">
+                <label for="medDuration">Duration (days)</label>
+                <input type="number" id="medDuration" min="1" value="7" />
+            </div>
+            <button class="btn" onclick="addReminder()">Add Reminder</button>
+            <button class="btn btn-secondary" onclick="requestNotificationPermission()">Enable Notifications</button>
+        </div>
+
+        <div id="reminderList" class="reminder-list"></div>
+
+        <div id="notificationStatus" style="margin-top: 1rem; padding: 1rem; background: rgba(77,208,225,0.1); border-radius: 10px; display: none;">
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                ℹ️ Note: Browser notifications only work while this page is open. For persistent reminders after closing browser, a service worker would be needed (not implemented in this demo).
+            </p>
+        </div>
+    </section>
+
+    <!-- 8. AI HEALTH SCORE -->
+    <section id="health-score">
+        <h2 class="section-title">📊 AI Health Score Summary</h2>
+        <div class="health-score-container">
+            <div class="score-ring">
+                <svg width="200" height="200" style="transform: rotate(-90deg);">
+                    <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(77,208,225,0.1)" stroke-width="15"/>
+                    <circle id="scoreCircle" cx="100" cy="100" r="90" fill="none" stroke="#4dd0e1" stroke-width="15" 
+                            stroke-dasharray="565.48" stroke-dashoffset="565.48" stroke-linecap="round"/>
+                </svg>
+                <div class="score-display" id="healthScore">--</div>
+            </div>
+
+            <div class="score-inputs">
+                <div class="form-group">
+                    <label for="sleepHours">Sleep (hours)</label>
+                    <input type="number" id="sleepHours" min="0" max="12" step="0.5" value="7" onchange="calculateHealthScore()" />
+                </div>
+                <div class="form-group">
+                    <label for="waterIntake">Water (glasses)</label>
+                    <input type="number" id="waterIntake" min="0" max="20" value="6" onchange="calculateHealthScore()" />
+                </div>
+                <div class="form-group">
+                    <label for="activityMins">Exercise (minutes)</label>
+                    <input type="number" id="activityMins" min="0" max="300" value="30" onchange="calculateHealthScore()" />
+                </div>
+                <div class="form-group">
+                    <label for="stressLevel">Stress (1-10)</label>
+                    <input type="number" id="stressLevel" min="1" max="10" value="5" onchange="calculateHealthScore()" />
+                </div>
+            </div>
+
+            <div id="scoreInterpretation" style="margin-top: 2rem; padding: 1.5rem; background: rgba(77,208,225,0.1); border-radius: 15px;">
+                <h4 style="color: var(--accent-color); margin-bottom: 0.5rem;">Your Health Assessment</h4>
+                <p id="scoreMessage">Adjust your daily metrics above to see your health score.</p>
+                <div id="scoreSuggestions" style="margin-top: 1rem;"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 9. PERSONAL HEALTH INSIGHTS -->
+    <!-- <section id="insights">
+        <h2 class="section-title">💡 Personal Health Care Insights</h2>
+        <div class="insight-card">
+            <div class="insight-text" id="rotatingTip">💧 Stay hydrated - drink at least 8 glasses of water today!</div>
+            <button class="btn" onclick="saveTip()">💾 Save This Tip</button>
+            <button class="btn btn-secondary" onclick="nextTip()">Next Tip ➡️</button>
+        </div>
+
+        <div id="savedTipsSection" style="display: none; margin-top: 2rem;">
+            <h3 style="color: var(--accent-color); margin-bottom: 1rem;">📌 Saved Tips</h3>
+            <div class="saved-tips" id="savedTipsList"></div>
+        </div>
+    </section> -->
+
+    <!-- 10. CONNECT WEARABLE DEVICES -->
+    <section>
+        <div class="wearable-section">
+            <h2 class="section-title">⌚ Connect Wearable Device</h2>
+            <div class="smartwatch-icon" onclick="connectWearable()">⌚</div>
+            <p id="wearableStatus">Click to connect your smartwatch</p>
+            <div class="wearable-data" id="wearableData">
+                <div class="data-item">
+                    <div class="data-value" id="heartRate">78</div>
+                    <div>Heart Rate (bpm)</div>
+                </div>
+                <div class="data-item">
+                    <div class="data-value" id="steps">6,542</div>
+                    <div>Steps</div>
+                </div>
+                <div class="data-item">
+                    <div class="data-value" id="spo2">97%</div>
+                    <div>SpO₂</div>
+                </div>
+                <div class="data-item">
+                    <div class="data-value" id="sleep">7h 15m</div>
+                    <div>Sleep</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 11. EMERGENCY: NEARBY HOSPITALS -->
+    <section id="emergency">
+        <h2 class="section-title">🚨 Emergency: Nearby Hospitals</h2>
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <button class="btn" onclick="findNearbyHospitals()">📍 Find Hospitals Near Me</button>
+        </div>
+
+        <div id="locationStatus" style="margin-bottom: 2rem; padding: 1rem; background: rgba(77,208,225,0.1); border-radius: 10px; display: none;">
+            <p id="locationMessage"></p>
+        </div>
+
+        <div class="hospital-list" id="hospitalList"></div>
+    </section>
+
+    <!-- 12. PRIVACY & TRUST -->
+    <!-- <section id="privacy">
+        <h2 class="section-title">🔒 Privacy & Trust</h2>
+        <div class="privacy-box">
+            <h3 style="color: var(--accent-color); margin-bottom: 1rem;">Your Data, Your Control</h3>
+            <p style="margin-bottom: 1rem;">
+                At HealthCheck AI, your privacy is our top priority. Here's how we protect your information:
+            </p>
+            <ul style="list-style: none; padding-left: 1rem;">
+                <li style="margin-bottom: 0.8rem;">✅ <strong>Local Storage Only:</strong> All data is stored in your browser's localStorage. Nothing is sent to external servers.</li>
+                <li style="margin-bottom: 0.8rem;">✅ <strong>No Server Transmission:</strong> Your health data never leaves your device.</li>
+                <li style="margin-bottom: 0.8rem;">✅ <strong>Optional Permissions:</strong> Notifications and geolocation are requested only when needed. You can deny them anytime.</li>
+                <li style="margin-bottom: 0.8rem;">✅ <strong>Full Control:</strong> Export, import, or delete all your data using the buttons below.</li>
+                <li style="margin-bottom: 0.8rem;">✅ <strong>No Tracking:</strong> We don't use cookies, analytics, or any tracking.</li>
+            </ul>
+            <div style="margin-top: 2rem; display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+                <button class="btn btn-secondary" onclick="exportData()">📤 Export Data</button>
+                <button class="btn btn-secondary" onclick="importData()">📥 Import Data</button>
+                <button class="btn" style="background: linear-gradient(135deg, #ff5252, #ff1744);" onclick="clearAllData()">🗑️ Delete All Data</button>
+            </div>
+        </div>
+    </section> -->
+
+    <!-- 13. HELPLINE & FEEDBACK -->
+    <section id="feedback">
+        <h2 class="section-title">📞 Helpline & Feedback</h2>
+        
+        <div style="text-align: center; margin-bottom: 3rem; padding: 2rem; background: var(--card-bg); border: 2px solid var(--accent-color); border-radius: 15px;">
+            <h3 style="color: var(--accent-color); margin-bottom: 1rem;">24/7 Emergency Helpline</h3>
+            <a href="tel:+911234567890" style="font-size: 2rem; color: var(--accent-color); text-decoration: none; font-weight: 700;">
+                📞 +91 123-456-7890
+            </a>
+            <p style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;">
+                (Sample number - For real emergencies, dial your local emergency number: 911/112/108)
+            </p>
+        </div>
+
+        <div class="feedback-form">
+            <h3 style="color: var(--accent-color); margin-bottom: 1.5rem;">We Value Your Feedback</h3>
+            
+            <div class="form-group">
+                <label>Rate Your Experience</label>
+                <div class="rating-stars" id="ratingStars">
+                    <span class="star" onclick="setRating(1)">⭐</span>
+                    <span class="star" onclick="setRating(2)">⭐</span>
+                    <span class="star" onclick="setRating(3)">⭐</span>
+                    <span class="star" onclick="setRating(4)">⭐</span>
+                    <span class="star" onclick="setRating(5)">⭐</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="feedbackComment">Your Feedback</label>
+                <textarea id="feedbackComment" placeholder="Share your experience..."></textarea>
+            </div>
+
+            <button class="btn" onclick="submitFeedback()">Submit Feedback</button>
+        </div>
+    </section>
+
+    <div style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+        <p>© 2024 HealthCheck AI - Your Wellness Partner</p>
+        <p style="margin-top: 0.5rem; font-size: 0.9rem;">Made with ❤️ for better health</p>
+    </div>
+
+    <!-- MODALS -->
+    <div class="modal" id="wellnessModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('wellnessModal')">&times;</button>
+            <h2 id="wellnessTitle" style="color: var(--accent-color); margin-bottom: 1.5rem;"></h2>
+            <div id="wellnessContent"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="meditationModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('meditationModal')">&times;</button>
+            <h2>🧘‍♀️ Guided Meditation</h2>
+            <div class="breathing-circle"></div>
+            <div class="timer-display" id="meditationTimer">5:00</div>
+            <p id="breathingInstruction">Breathe in slowly...</p>
+            <button class="btn" id="meditationBtn" onclick="toggleMeditation()">Start</button>
+        </div>
+    </div>
+
+    <div class="modal" id="yogaModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('yogaModal')">&times;</button>
+            <h2>🧘‍♂️ Yoga Session</h2>
+            <div id="yogaPose" style="font-size: 4rem; margin: 2rem 0;">🧘</div>
+            <h3 id="yogaPoseName">Mountain Pose (Tadasana)</h3>
+            <p id="yogaInstruction">Stand tall with feet together, arms at sides. Breathe deeply.</p>
+            <div class="timer-display" id="yogaTimer">0:30</div>
+            <button class="btn" id="yogaBtn" onclick="toggleYoga()">Start Session</button>
+        </div>
+    </div>
+
+    <script>
+        /* ============================================
+           GLOBAL VARIABLES & INITIALIZATION
+           ============================================ */
+        let userName = localStorage.getItem('userName') || 'Friend';
+        let wearableConnected = localStorage.getItem('wearableConnected') === 'true';
+        let wearableInterval = null;
+        let musicPlaying = false;
+        let musicInterval = null;
+        let musicSeconds = 0;
+        let meditationInterval = null;
+        let meditationSeconds = 300;
+        let yogaInterval = null;
+        let yogaSeconds = 30;
+        let yogaRunning = false;
+        let currentYogaPose = 0;
+        let currentTipIndex = 0;
+        let selectedRating = 0;
+        let currentSymptom = '';
+        let symptomQuestionIndex = 0;
+        let symptomAnswers = [];
+        let reminderTimeouts = [];
+
+        const AVATAR_PHRASES = [
+            "Remember to stay hydrated today! 💧",
+            "Take a deep breath and relax! 🧘",
+            "You're doing great! Keep it up! 💪",
+            "Don't forget to stretch! 🤸",
+            "Your health is an investment! 💖"
+        ];
+
+        const healthTips = [
+            "💧 Stay hydrated - drink at least 8 glasses of water daily!",
+            "🥗 Eat colorful fruits and vegetables in every meal",
+            "😴 Get 7-8 hours of quality sleep for optimal health",
+            "🚶 Take 10,000 steps daily for cardiovascular health",
+            "🧘 Practice mindfulness meditation for 10 minutes",
+            "🥤 Limit sugar - choose water over sugary drinks",
+            "🏃 Exercise at least 30 minutes, 5 days a week",
+            "📱 Take breaks from screens every hour",
+            "🧼 Wash hands frequently to prevent infections",
+            "😊 Maintain positive social connections",
+            "🍎 Eat fiber-rich foods daily",
+            "☀️ Get 15 minutes of sunlight for Vitamin D",
+            "🧘‍♀️ Stretch daily to improve flexibility",
+            "💊 Take medications as prescribed",
+            "🚭 Avoid smoking and limit alcohol"
+        ];
+
+        const aiResponses = {
+            headache: [
+                "Headaches can have many causes. Try resting in a quiet, dark room and stay hydrated. If severe or persistent, consult a doctor.",
+                "For headaches, ensure adequate water, sleep, and stress management. OTC pain relievers may help, but see a provider if it persists."
+            ],
+            fever: [
+                "A fever means your body is fighting infection. Stay hydrated, rest, and monitor temperature. If it exceeds 103°F or lasts 3+ days, seek care.",
+                "Manage fever with rest, fluids, and medication. Watch for difficulty breathing or severe pain - these need immediate attention."
+            ],
+            cough: [
+                "Coughs have various causes. Stay hydrated, try honey, avoid irritants. If with high fever, breathing difficulty, or lasting 3+ weeks, see a doctor.",
+                "For persistent coughs, try warm liquids and steam. Coughing blood, chest pain, or breathing trouble requires urgent care."
+            ],
+            pain: [
+                "Pain management depends on location and severity. Rest, ice/heat, and OTC relievers can help. Severe pain needs evaluation.",
+                "Chronic pain requires proper diagnosis. Try stretching, good posture, and track when pain occurs. Consult a provider for ongoing issues."
+            ],
+            fatigue: [
+                "Fatigue can stem from poor sleep, stress, or conditions. Ensure 7-8 hours sleep, exercise, and nutrition. Persistent fatigue needs a check-up.",
+                "Combat fatigue with regular sleep schedules, stress management, and activity. If affecting daily life despite rest, see your doctor."
+            ],
+            general: [
+                "Thank you for sharing. I'd recommend monitoring your symptoms. If they persist or worsen, please consult a healthcare professional.",
+                "I understand your concern. Your specific situation may benefit from a professional consultation. Would you like help finding a specialist?",
+                "That's an important question. For personalized advice tailored to your situation, I recommend speaking with a qualified healthcare provider.",
+                "I appreciate you reaching out. General advice is helpful, but your health history matters. Consider scheduling a consultation.",
+                "Your health is important. While I can share general information, proper diagnosis requires professional evaluation.",
+                "Based on common knowledge, here's what's typically recommended. However, please consult with a healthcare provider for personalized advice.",
+                "I'm here to guide you. For your specific symptoms, the best approach is to have a medical professional review your case."
+            ]
+        };
+
+        const symptomQuestions = {
+            'Headache': [
+                { q: "How severe is your headache (1-10)?", type: "number" },
+                { q: "Is it accompanied by nausea or vomiting?", type: "yesno" },
+                { q: "Do you have sensitivity to light or sound?", type: "yesno" },
+                { q: "How long have you had this headache?", type: "text" }
+            ],
+            'Fever': [
+                { q: "What is your current temperature?", type: "text" },
+                { q: "How long have you had the fever?", type: "text" },
+                { q: "Are you experiencing chills or sweating?", type: "yesno" },
+                { q: "Any other symptoms (cough, sore throat)?", type: "text" }
+            ],
+            'Cough': [
+                { q: "Is your cough dry or producing mucus?", type: "text" },
+                { q: "How long have you been coughing?", type: "text" },
+                { q: "Are you experiencing shortness of breath?", type: "yesno" },
+                { q: "Do you have chest pain when coughing?", type: "yesno" }
+            ],
+            'Fatigue': [
+                { q: "How long have you been feeling fatigued?", type: "text" },
+                { q: "Are you getting adequate sleep (7-8 hours)?", type: "yesno" },
+                { q: "Recent stress or life changes?", type: "yesno" },
+                { q: "Are you eating regular, balanced meals?", type: "yesno" }
+            ],
+            'Nausea': [
+                { q: "Have you vomited?", type: "yesno" },
+                { q: "When did the nausea start?", type: "text" },
+                { q: "Did you eat anything unusual recently?", type: "yesno" },
+                { q: "Do you have abdominal pain?", type: "yesno" }
+            ],
+            'Pain': [
+                { q: "Where is the pain located?", type: "text" },
+                { q: "On a scale of 1-10, how severe?", type: "number" },
+                { q: "Is the pain constant or intermittent?", type: "text" },
+                { q: "Does anything make it better or worse?", type: "text" }
+            ]
+        };
+
+        const wellnessContent = {
+            diet: {
+                title: "🥗 Diet Recommendations",
+                content: `<strong>Based on your health profile:</strong><br><br>
+                • Include more leafy greens and fiber<br>
+                • Reduce processed foods and sugar<br>
+                • Eat 5 servings of fruits/vegetables daily<br>
+                • Stay hydrated with 8 glasses of water<br>
+                • Include protein in every meal<br>
+                • Choose whole grains over refined<br><br>
+                <strong>Suggested Meal Plan:</strong><br>
+                Breakfast: Oatmeal with berries<br>
+                Lunch: Grilled chicken salad<br>
+                Dinner: Baked fish with vegetables<br>
+                Snacks: Nuts, fruits, yogurt`
+            },
+            sleep: {
+                title: "💤 Sleep Analysis",
+                content: `<strong>Last night: 7 hours 15 minutes</strong><br>
+                Quality: Good ✅<br>
+                Deep Sleep: 2h 30m<br>
+                REM Sleep: 1h 45m<br>
+                Light Sleep: 3h 00m<br><br>
+                <strong>Tips for Better Sleep:</strong><br>
+                • Maintain consistent sleep schedule<br>
+                • Avoid screens 1 hour before bed<br>
+                • Keep room cool (65-68°F) and dark<br>
+                • Try relaxation techniques<br>
+                • Avoid caffeine after 2 PM<br>
+                • Exercise regularly but not before bed`
+            },
+            exercise: {
+                title: "🏃‍♂️ Exercise Goals",
+                content: `<strong>Current Streak: 5 days 🔥</strong><br>
+                Weekly Goal: 150 minutes<br>
+                Completed: 120 minutes<br>
+                Remaining: 30 minutes<br><br>
+                <strong>Today's Suggestion:</strong><br>
+                • 30 min brisk walk or jog<br>
+                • 15 min strength training<br>
+                • 10 min stretching<br><br>
+                <strong>This Week's Progress:</strong><br>
+                Monday: ✅ 30 min cardio<br>
+                Tuesday: ✅ 25 min yoga<br>
+                Wednesday: ✅ 35 min cycling<br>
+                Thursday: ✅ 30 min swimming<br>
+                Friday: Today!`
+            },
+            tips: {
+                title: "🩺 Health Tips",
+                content: `<strong>Daily Health Tips:</strong><br><br>
+                • Take breaks every hour when sitting<br>
+                • Practice deep breathing exercises<br>
+                • Maintain good posture<br>
+                • Stretch daily for flexibility<br>
+                • Get regular health check-ups<br>
+                • Manage stress effectively<br>
+                • Wash hands frequently<br>
+                • Stay socially connected<br>
+                • Limit alcohol consumption<br>
+                • Don't skip meals<br><br>
+                <strong>Remember:</strong> Prevention is better than cure!`
+            }
+        };
+
+        const yogaPoses = [
+            { name: 'Mountain Pose (Tadasana)', instruction: 'Stand tall with feet together, arms at sides. Breathe deeply.', emoji: '🧘', duration: 30 },
+            { name: 'Tree Pose (Vrksasana)', instruction: 'Balance on one leg, place other foot on inner thigh. Hands in prayer.', emoji: '🌳', duration: 30 },
+            { name: 'Warrior Pose (Virabhadrasana)', instruction: 'Step one leg back, bend front knee, extend arms parallel.', emoji: '🏹', duration: 30 },
+            { name: 'Child\'s Pose (Balasana)', instruction: 'Kneel and sit back on heels, extend arms forward, rest forehead.', emoji: '😌', duration: 30 }
+        ];
+
+        const mockHospitals = [
+            { name: 'City General Hospital', address: '123 Main St, Downtown', phone: '+91-123-4567890', distance: 'Calculating...' },
+            { name: 'Apollo HealthCare Center', address: '456 Park Avenue', phone: '+91-234-5678901', distance: 'Calculating...' },
+            { name: 'Max SuperSpecialty Hospital', address: '789 Medical District', phone: '+91-345-6789012', distance: 'Calculating...' },
+            { name: 'Fortis Emergency Care', address: '321 Health Boulevard', phone: '+91-456-7890123', distance: 'Calculating...' }
+        ];
+
+        /* ============================================
+           INITIALIZATION ON PAGE LOAD
+           ============================================ */
+        window.addEventListener('DOMContentLoaded', function() {
+            updateGreeting();
+            loadReminders();
+            loadSavedTips();
+            calculateHealthScore();
+            if (wearableConnected) {
+                document.getElementById('wearableData').classList.add('active');
+                document.getElementById('wearableStatus').textContent = '✅ Connected to HealthWatch';
+                startWearableUpdates();
+            }
+            rotateTips();
+            setTodayDate();
+        });
+
+        function setTodayDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('medStart').value = today;
+        }
+
+        /* ============================================
+           2. AVATAR / HEALTH BUDDY FUNCTIONS
+           ============================================ */
+        function updateGreeting() {
+            const hour = new Date().getHours();
+            let greeting = 'Good morning';
+            if (hour >= 12 && hour < 17) greeting = 'Good afternoon';
+            else if (hour >= 17) greeting = 'Good evening';
+            
+            document.getElementById('avatarSpeech').textContent = 
+                `${greeting}, ${userName}! Ready for a health checkup?`;
+        }
+
+        function setUserName() {
+            const input = document.getElementById('userName');
+            if (input.value.trim()) {
+                userName = input.value.trim();
+                localStorage.setItem('userName', userName);
+                updateGreeting();
+                showToast('✅ Name saved successfully!');
+            }
+        }
+
+        function avatarSpeak() {
+            const phrase = AVATAR_PHRASES[Math.floor(Math.random() * AVATAR_PHRASES.length)];
+            document.getElementById('avatarSpeech').textContent = phrase;
+        }
+
+        /* ============================================
+           3. AI DOCTOR CHAT - WITH VARIED RESPONSES
+           ============================================ */
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            const messagesContainer = document.getElementById('chatMessages');
+            
+            messagesContainer.innerHTML += `
+                <div class="message user-message">
+                    <strong>You:</strong> ${message}
+                </div>
+            `;
+
+            setTimeout(() => {
+                let response = getAIResponse(message);
+                
+                messagesContainer.innerHTML += `
+                    <div class="message ai-message">
+                        <strong>AI Doctor:</strong> ${response}
+                        <div class="disclaimer">⚠️ For educational purposes only. Not a substitute for professional medical advice.</div>
+                    </div>
+                `;
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }, 800);
+
+            input.value = '';
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function getAIResponse(message) {
+            const lowerMsg = message.toLowerCase();
+            
+            // Check for keywords
+            if (lowerMsg.includes('headache') || lowerMsg.includes('head')) {
+                return aiResponses.headache[Math.floor(Math.random() * aiResponses.headache.length)];
+            }
+            if (lowerMsg.includes('fever') || lowerMsg.includes('temperature')) {
+                return aiResponses.fever[Math.floor(Math.random() * aiResponses.fever.length)];
+            }
+            if (lowerMsg.includes('cough')) {
+                return aiResponses.cough[Math.floor(Math.random() * aiResponses.cough.length)];
+            }
+            if (lowerMsg.includes('pain') || lowerMsg.includes('hurt')) {
+                return aiResponses.pain[Math.floor(Math.random() * aiResponses.pain.length)];
+            }
+            if (lowerMsg.includes('tired') || lowerMsg.includes('fatigue') || lowerMsg.includes('exhausted')) {
+                return aiResponses.fatigue[Math.floor(Math.random() * aiResponses.fatigue.length)];
+            }
+            
+            // Default to general response
+            return aiResponses.general[Math.floor(Math.random() * aiResponses.general.length)];
+        }
+
+        function clearChat() {
+            document.getElementById('chatMessages').innerHTML = `
+                <div class="message ai-message">
+                    <strong>AI Doctor:</strong> Hello! I'm your AI health assistant. I can provide general health information. How can I help you today?
+                    <div class="disclaimer">⚠️ For educational purposes only. Not a substitute for professional medical advice.</div>
+                </div>
+            `;
+        }
+
+        document.getElementById('chatInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        /* ============================================
+           4. WELLNESS ZONE MODALS
+           ============================================ */
+        function openWellnessModal(type) {
+            const modal = document.getElementById('wellnessModal');
+            const content = wellnessContent[type];
+            document.getElementById('wellnessTitle').textContent = content.title;
+            document.getElementById('wellnessContent').innerHTML = content.content;
+            modal.classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            if (modalId === 'meditationModal') stopMeditation();
+            if (modalId === 'yogaModal') stopYoga();
+        }
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+            }
+        }
+
+        /* ============================================
+           5. MENTAL WELLBEING TABS
+           ============================================ */
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        function startYoga() {
+            document.getElementById('yogaModal').classList.add('active');
+            currentYogaPose = 0;
+            updateYogaPose();
+        }
+
+        function updateYogaPose() {
+            const pose = yogaPoses[currentYogaPose];
+            document.getElementById('yogaPose').textContent = pose.emoji;
+            document.getElementById('yogaPoseName').textContent = pose.name;
+            document.getElementById('yogaInstruction').textContent = pose.instruction;
+            yogaSeconds = pose.duration;
+            document.getElementById('yogaTimer').textContent = `0:${yogaSeconds}`;
+        }
+
+        function toggleYoga() {
+            if (yogaRunning) {
+                stopYoga();
+            } else {
+                document.getElementById('yogaBtn').textContent = 'Pause';
+                yogaRunning = true;
+                yogaInterval = setInterval(() => {
+                    yogaSeconds--;
+                    document.getElementById('yogaTimer').textContent = `0:${yogaSeconds.toString().padStart(2, '0')}`;
+                    
+                    if (yogaSeconds <= 0) {
+                        currentYogaPose++;
+                        if (currentYogaPose >= yogaPoses.length) {
+                            stopYoga();
+                            showToast('🎉 Yoga session complete! Namaste! 🙏');
+                            closeModal('yogaModal');
+                            currentYogaPose = 0;
+                        } else {
+                            updateYogaPose();
+                        }
+                    }
+                }, 1000);
+            }
+        }
+
+        function stopYoga() {
+            if (yogaInterval) {
+                clearInterval(yogaInterval);
+                yogaInterval = null;
+                yogaRunning = false;
+                document.getElementById('yogaBtn').textContent = 'Start Session';
+            }
+        }
+
+        function playMusic() {
+            if (musicPlaying) {
+                clearInterval(musicInterval);
+                musicPlaying = false;
+                document.getElementById('musicBtn').textContent = '▶️ Play Music';
+            } else {
+                musicPlaying = true;
+                document.getElementById('musicBtn').textContent = '⏸️ Pause';
+                musicInterval = setInterval(() => {
+                    musicSeconds++;
+                    const mins = Math.floor(musicSeconds / 60);
+                    const secs = musicSeconds % 60;
+                    document.getElementById('currentTime').textContent = 
+                        `${mins}:${secs.toString().padStart(2, '0')}`;
+                    
+                    const progress = (musicSeconds / 600) * 100;
+                    document.getElementById('musicProgress').style.width = progress + '%';
+                    
+                    if (musicSeconds >= 600) {
+                        musicSeconds = 0;
+                        document.getElementById('musicProgress').style.width = '0%';
+                    }
+                }, 1000);
+            }
+        }
+
+        function startMeditation() {
+            document.getElementById('meditationModal').classList.add('active');
+        }
+
+        function toggleMeditation() {
+            if (meditationInterval) {
+                stopMeditation();
+            } else {
+                document.getElementById('meditationBtn').textContent = 'Pause';
+                meditationInterval = setInterval(() => {
+                    meditationSeconds--;
+                    const mins = Math.floor(meditationSeconds / 60);
+                    const secs = meditationSeconds % 60;
+                    document.getElementById('meditationTimer').textContent = 
+                        `${mins}:${secs.toString().padStart(2, '0')}`;
+                    
+                    const phase = meditationSeconds % 8;
+                    const instruction = document.getElementById('breathingInstruction');
+                    if (phase === 0) instruction.textContent = 'Breathe in slowly...';
+                    else if (phase === 4) instruction.textContent = 'Breathe out slowly...';
+                    
+                    if (meditationSeconds <= 0) {
+                        stopMeditation();
+                        showToast('🎉 Meditation complete! Well done!');
+                        closeModal('meditationModal');
+                        meditationSeconds = 300;
+                    }
+                }, 1000);
+            }
+        }
+
+        function stopMeditation() {
+            if (meditationInterval) {
+                clearInterval(meditationInterval);
+                meditationInterval = null;
+                document.getElementById('meditationBtn').textContent = 'Start';
+            }
+        }
+
+        /* ============================================
+           6. SYMPTOM CHECKER WITH DECISION TREE
+           ============================================ */
+        function selectSymptom(symptom) {
+            document.querySelectorAll('.symptom-tag').forEach(tag => {
+                tag.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+            document.getElementById('customSymptom').value = symptom;
+        }
+
+        function startSymptomCheck() {
+            currentSymptom = document.getElementById('customSymptom').value.trim();
+            if (!currentSymptom) {
+                showToast('⚠️ Please enter or select a symptom');
+                return;
+            }
+
+            symptomQuestionIndex = 0;
+            symptomAnswers = [];
+            
+            const questions = symptomQuestions[currentSymptom] || [
+                { q: "How long have you had this symptom?", type: "text" },
+                { q: "On a scale of 1-10, how severe is it?", type: "number" },
+                { q: "Does it affect your daily activities?", type: "yesno" }
+            ];
+
+            document.getElementById('symptomQuestions').style.display = 'block';
+            document.getElementById('symptomResults').style.display = 'none';
+            
+            // Create stepper
+            const stepper = document.getElementById('stepper');
+            stepper.innerHTML = '';
+            for (let i = 0; i < questions.length; i++) {
+                const step = document.createElement('div');
+                step.className = 'step' + (i === 0 ? ' active' : '');
+                step.textContent = i + 1;
+                stepper.appendChild(step);
+            }
+            
+            showSymptomQuestion(questions);
+        }
+
+        function showSymptomQuestion(questions) {
+            if (symptomQuestionIndex >= questions.length) {
+                showSymptomResults();
+                return;
+            }
+
+            const question = questions[symptomQuestionIndex];
+            const questionArea = document.getElementById('questionArea');
+            
+            let inputHTML = '';
+            if (question.type === 'yesno') {
+                inputHTML = `
+                    <button class="btn" onclick="answerSymptom('Yes')">Yes</button>
+                    <button class="btn btn-secondary" onclick="answerSymptom('No')">No</button>
+                `;
+            } else if (question.type === 'number') {
+                inputHTML = `
+                    <input type="number" id="symptomAnswer" class="name-input" style="width: 100%; margin: 1rem 0;" min="1" max="10" />
+                    <button class="btn" onclick="answerSymptom(document.getElementById('symptomAnswer').value)">Next</button>
+                `;
+            } else {
+                inputHTML = `
+                    <input type="text" id="symptomAnswer" class="name-input" style="width: 100%; margin: 1rem 0;" />
+                    <button class="btn" onclick="answerSymptom(document.getElementById('symptomAnswer').value)">Next</button>
+                `;
+            }
+            
+            questionArea.innerHTML = `
+                <div class="question-container">
+                    <h4 style="color: var(--accent-color); margin-bottom: 1rem;">Question ${symptomQuestionIndex + 1} of ${questions.length}</h4>
+                    <p style="font-size: 1.1rem; margin-bottom: 1.5rem;">${question.q}</p>
+                    ${inputHTML}
+                </div>
+            `;
+
+            // Update stepper
+            document.querySelectorAll('.step').forEach((step, idx) => {
+                if (idx === symptomQuestionIndex) step.classList.add('active');
+            });
+        }
+
+        function answerSymptom(answer) {
+            if (!answer || answer.trim() === '') {
+                showToast('⚠️ Please provide an answer');
+                return;
+            }
+
+            symptomAnswers.push(answer);
+            symptomQuestionIndex++;
+            
+            const questions = symptomQuestions[currentSymptom] || [
+                { q: "How long have you had this symptom?", type: "text" },
+                { q: "On a scale of 1-10, how severe is it?", type: "number" },
+                { q: "Does it affect your daily activities?", type: "yesno" }
+            ];
+            
+            showSymptomQuestion(questions);
+        }
+
+        function showSymptomResults() {
+            document.getElementById('symptomQuestions').style.display = 'none';
+            
+            const resultsDiv = document.getElementById('symptomResults');
+            resultsDiv.style.display = 'block';
+            
+            resultsDiv.innerHTML = `
+                <div style="background: rgba(77,208,225,0.1); border: 1px solid var(--accent-color); border-radius: 15px; padding: 2rem;">
+                    <h3 style="color: var(--accent-color); margin-bottom: 1rem;">Assessment Results for: ${currentSymptom}</h3>
+                    
+                    <div style="margin: 1.5rem 0;">
+                        <h4 style="color: var(--accent-color);">Home Care Suggestions:</h4>
+                        <ul style="margin-top: 0.5rem; padding-left: 2rem;">
+                            <li>Rest and avoid strenuous activities</li>
+                            <li>Stay hydrated with plenty of fluids</li>
+                            <li>Monitor your symptoms closely</li>
+                            <li>Use over-the-counter remedies as appropriate</li>
+                        </ul>
+                    </div>
+                    
+                    <div style="margin: 1.5rem 0; padding: 1rem; background: rgba(255,165,0,0.1); border-left: 3px solid orange; border-radius: 8px;">
+                        <h4 style="color: orange;">⚠️ When to See a Doctor:</h4>
+                        <ul style="margin-top: 0.5rem; padding-left: 2rem;">
+                            <li>If symptoms persist for more than 3 days</li>
+                            <li>If symptoms worsen despite home care</li>
+                            <li>If you develop new concerning symptoms</li>
+                            <li>If pain becomes severe or unbearable</li>
+                        </ul>
+                    </div>
+                    
+                    <div style="margin: 1.5rem 0; padding: 1rem; background: rgba(255,82,82,0.1); border-left: 3px solid red; border-radius: 8px;">
+                        <h4 style="color: #ff5252;">🚨 Seek Immediate Care If:</h4>
+                        <ul style="margin-top: 0.5rem; padding-left: 2rem;">
+                            <li>Difficulty breathing or chest pain</li>
+                            <li>Severe bleeding or head injury</li>
+                            <li>Loss of consciousness or confusion</li>
+                            <li>High fever (above 103°F/39.4°C)</li>
+                            <li>Sudden severe pain</li>
+                        </ul>
+                    </div>
+                    
+                    <p style="text-align: center; margin-top: 2rem; font-weight: 600; color: var(--text-secondary);">
+                        ⚕️ This is general guidance only. For personalized medical advice, please consult a healthcare professional.
+                    </p>
+                    
+                    <div style="text-align: center; margin-top: 1.5rem;">
+                        <button class="btn" onclick="document.getElementById('symptomResults').style.display='none'; document.getElementById('customSymptom').value='';">
+                            Start New Assessment
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        /* ============================================
+           7. MEDICINE REMINDER WITH NOTIFICATIONS
+           ============================================ */
+        function updateTimeInputs() {
+            const times = parseInt(document.getElementById('medTimes').value);
+            const container = document.getElementById('timeInputsContainer');
+            container.innerHTML = '';
+            
+            for (let i = 1; i <= times; i++) {
+                const defaultTime = `${(6 + i * 4).toString().padStart(2, '0')}:00`;
+                container.innerHTML += `
+                    <div class="form-group">
+                        <label for="medTime${i}">Time ${i}</label>
+                        <input type="time" id="medTime${i}" value="${defaultTime}" />
+                    </div>
+                `;
+            }
+        }
+
+        function requestNotificationPermission() {
+            if (!("Notification" in window)) {
+                showToast('⚠️ This browser does not support notifications');
+                return;
+            }
+
+            Notification.requestPermission().then(permission => {
+                if (permission === 'granted') {
+                    showToast('✅ Notifications enabled!');
+                    document.getElementById('notificationStatus').style.display = 'block';
+                } else {
+                    showToast('⚠️ Notification permission denied. Will use in-page alerts.');
+                    document.getElementById('notificationStatus').style.display = 'block';
+                }
+            });
+        }
+
+        function addReminder() {
+            const name = document.getElementById('medName').value.trim();
+            const dose = document.getElementById('medDose').value.trim();
+            const times = parseInt(document.getElementById('medTimes').value);
+            const start = document.getElementById('medStart').value;
+            const duration = parseInt(document.getElementById('medDuration').value);
+
+            if (!name || !dose || !start) {
+                showToast('⚠️ Please fill all required fields');
+                return;
+            }
+
+            const timesList = [];
+            for (let i = 1; i <= times; i++) {
+                const time = document.getElementById(`medTime${i}`).value;
+                if (time) timesList.push(time);
+            }
+
+            const reminder = {
+                id: Date.now(),
+                name,
+                dose,
+                times: timesList,
+                startDate: start,
+                duration,
+                created: new Date().toISOString()
+            };
+
+            const reminders = JSON.parse(localStorage.getItem('reminders') || '[]');
+            reminders.push(reminder);
+            localStorage.setItem('reminders', JSON.stringify(reminders));
+
+            // Schedule notifications
+            scheduleReminder(reminder);
+
+            // Clear form
+            document.getElementById('medName').value = '';
+            document.getElementById('medDose').value = '';
+            document.getElementById('medTimes').value = '1';
+            updateTimeInputs();
+
+            loadReminders();
+            showToast('✅ Reminder added successfully!');
+        }
+
+        function scheduleReminder(reminder) {
+            const startDate = new Date(reminder.startDate);
+            const endDate = new Date(startDate);
+            endDate.setDate(endDate.getDate() + reminder.duration);
+
+            reminder.times.forEach(time => {
+                const [hours, minutes] = time.split(':');
+                const checkReminder = () => {
+                    const now = new Date();
+                    const reminderTime = new Date();
+                    reminderTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+
+                    if (now >= startDate && now <= endDate && 
+                        now.getHours() === reminderTime.getHours() && 
+                        now.getMinutes() === reminderTime.getMinutes()) {
+                        
+                        if (Notification.permission === 'granted') {
+                            new Notification('💊 Medicine Reminder', {
+                                body: `Time to take ${reminder.name} (${reminder.dose})`,
+                                icon: '💊',
+                                requireInteraction: true
+                            });
+                        } else {
+                            // Fallback to in-page alert
+                            showToast(`💊 Medicine Reminder: ${reminder.name} (${reminder.dose})`);
+                            alert(`💊 Time to take your medicine!\n\n${reminder.name} - ${reminder.dose}`);
+                        }
+                    }
+                };
+
+                // Check every minute
+                const intervalId = setInterval(checkReminder, 60000);
+                reminderTimeouts.push(intervalId);
+                
+                // Check immediately in case it's time now
+                checkReminder();
+            });
+        }
+
+        function loadReminders() {
+            const reminders = JSON.parse(localStorage.getItem('reminders') || '[]');
+            const listDiv = document.getElementById('reminderList');
+            
+            if (reminders.length === 0) {
+                listDiv.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No reminders yet. Add your first one above!</p>';
+                return;
+            }
+
+            listDiv.innerHTML = reminders.map(r => `
+                <div class="reminder-item">
+                    <div>
+                        <h4 style="color: var(--accent-color);">${r.name}</h4>
+                        <p style="color: var(--text-secondary);">Dose: ${r.dose} | Times: ${r.times.join(', ')}</p>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                            ${r.startDate} to ${new Date(new Date(r.startDate).getTime() + r.duration * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}
+                        </p>
+                    </div>
+                    <div class="reminder-actions">
+                        <button class="icon-btn" onclick="editReminder(${r.id})" title="Edit">✏️</button>
+                        <button class="icon-btn" onclick="deleteReminder(${r.id})" title="Delete">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Re-schedule all reminders
+            reminders.forEach(r => scheduleReminder(r));
+        }
+
+        function editReminder(id) {
+            const reminders = JSON.parse(localStorage.getItem('reminders') || '[]');
+            const reminder = reminders.find(r => r.id === id);
+            if (!reminder) return;
+
+            document.getElementById('medName').value = reminder.name;
+            document.getElementById('medDose').value = reminder.dose;
+            document.getElementById('medTimes').value = reminder.times.length;
+            updateTimeInputs();
+            
+            reminder.times.forEach((time, idx) => {
+                document.getElementById(`medTime${idx + 1}`).value = time;
+            });
+            
+            document.getElementById('medStart').value = reminder.startDate;
+            document.getElementById('medDuration').value = reminder.duration;
+
+            deleteReminder(id);
+            document.querySelector('html').scrollTo({ top: document.getElementById('medicine').offsetTop - 80, behavior: 'smooth' });
+        }
+
+        function deleteReminder(id) {
+            const reminders = JSON.parse(localStorage.getItem('reminders') || '[]');
+            const filtered = reminders.filter(r => r.id !== id);
+            localStorage.setItem('reminders', JSON.stringify(filtered));
+            loadReminders();
+            showToast('✅ Reminder deleted');
+        }
+
+        /* ============================================
+           8. AI HEALTH SCORE CALCULATION
+           ============================================ */
+        function calculateHealthScore() {
+            const sleep = parseFloat(document.getElementById('sleepHours').value) || 0;
+            const water = parseInt(document.getElementById('waterIntake').value) || 0;
+            const activity = parseInt(document.getElementById('activityMins').value) || 0;
+            const stress = parseInt(document.getElementById('stressLevel').value) || 5;
+
+            // Score calculation logic
+            let score = 0;
+            
+            // Sleep (0-25 points)
+            if (sleep >= 7 && sleep <= 9) score += 25;
+            else if (sleep >= 6 && sleep < 7) score += 20;
+            else if (sleep >= 5 && sleep < 6) score += 15;
+            else score += 10;
+
+            // Water (0-25 points)
+            if (water >= 8) score += 25;
+            else if (water >= 6) score += 20;
+            else if (water >= 4) score += 15;
+            else score += 10;
+
+            // Activity (0-25 points)
+            if (activity >= 30) score += 25;
+            else if (activity >= 20) score += 20;
+            else if (activity >= 10) score += 15;
+            else score += 10;
+
+            // Stress (0-25 points, inverse)
+            score += Math.max(0, 25 - (stress * 2.5));
+
+            score = Math.round(score);
+
+            // Update display
+            document.getElementById('healthScore').textContent = score;
+            
+            // Update ring
+            const circle = document.getElementById('scoreCircle');
+            const circumference = 565.48;
+            const offset = circumference - (score / 100) * circumference;
+            circle.style.strokeDashoffset = offset;
+
+            // Save to localStorage
+            localStorage.setItem('healthScore', JSON.stringify({ sleep, water, activity, stress, score }));
+
+            // Generate interpretation
+            let message, color, suggestions = '';
+            if (score >= 80) {
+                message = '🎉 Excellent! Your health habits are outstanding!';
+                color = '#4dd0e1';
+            } else if (score >= 60) {
+                message = '👍 Good! You\'re on the right track. Keep it up!';
+                color = '#4dd0e1';
+                suggestions = '<p>Focus on improving your weaker areas for an even better score.</p>';
+            } else if (score >= 40) {
+                message = '⚠️ Fair. There\'s room for improvement in your health habits.';
+                color = 'orange';
+                suggestions = '<p><strong>Suggestions:</strong></p><ul style="text-align: left; padding-left: 2rem;"><li>Aim for 7-8 hours of sleep</li><li>Increase water intake to 8 glasses</li><li>Exercise at least 30 minutes daily</li><li>Practice stress management techniques</li></ul>';
+            } else {
+                message = '🚨 Needs Attention. Please focus on improving your health habits.';
+                color = '#ff5252';
+                suggestions = '<p><strong>Priority Actions:</strong></p><ul style="text-align: left; padding-left: 2rem;"><li>Establish a consistent sleep schedule</li><li>Dramatically increase water intake</li><li>Start with 10-15 minutes of daily movement</li><li>Consider stress management resources</li></ul>';
+            }
+
+            document.getElementById('scoreMessage').innerHTML = message;
+            document.getElementById('scoreMessage').style.color = color;
+            document.getElementById('scoreSuggestions').innerHTML = suggestions;
+        }
+
+        /* ============================================
+           9. PERSONAL HEALTH INSIGHTS - ROTATING TIPS
+           ============================================ */
+        function rotateTips() {
+            setInterval(() => {
+                nextTip();
+            }, 15000); // Rotate every 15 seconds
+        }
+
+        function nextTip() {
+            currentTipIndex = (currentTipIndex + 1) % healthTips.length;
+            document.getElementById('rotatingTip').textContent = healthTips[currentTipIndex];
+        }
+
+        function saveTip() {
+            const currentTip = healthTips[currentTipIndex];
+            const savedTips = JSON.parse(localStorage.getItem('savedTips') || '[]');
+            
+            if (!savedTips.includes(currentTip)) {
+                savedTips.push(currentTip);
+                localStorage.setItem('savedTips', JSON.stringify(savedTips));
+                showToast('✅ Tip saved!');
+                loadSavedTips();
+            } else {
+                showToast('ℹ️ Tip already saved');
+            }
+        }
+
+        function loadSavedTips() {
+            const savedTips = JSON.parse(localStorage.getItem('savedTips') || '[]');
+            const section = document.getElementById('savedTipsSection');
+            const listDiv = document.getElementById('savedTipsList');
+            
+            if (savedTips.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+
+            section.style.display = 'block';
+            listDiv.innerHTML = savedTips.map((tip, idx) => `
+                <div class="saved-tip">
+                    <span>${tip}</span>
+                    <button class="icon-btn" onclick="removeSavedTip(${idx})" title="Remove">🗑️</button>
+                </div>
+            `).join('');
+        }
+
+        function removeSavedTip(index) {
+            const savedTips = JSON.parse(localStorage.getItem('savedTips') || '[]');
+            savedTips.splice(index, 1);
+            localStorage.setItem('savedTips', JSON.stringify(savedTips));
+            loadSavedTips();
+            showToast('✅ Tip removed');
+        }
+
+        /* ============================================
+           10. WEARABLE DEVICE CONNECTION
+           ============================================ */
+        function connectWearable() {
+            wearableConnected = !wearableConnected;
+            localStorage.setItem('wearableConnected', wearableConnected);
+            
+            const dataDiv = document.getElementById('wearableData');
+            const statusText = document.getElementById('wearableStatus');
+            
+            if (wearableConnected) {
+                dataDiv.classList.add('active');
+                statusText.textContent = '✅ Connected to HealthWatch';
+                showToast('⌚ Smartwatch connected successfully!');
+                startWearableUpdates();
+            } else {
+                dataDiv.classList.remove('active');
+                statusText.textContent = 'Click to connect your smartwatch';
+                showToast('⌚ Smartwatch disconnected');
+                if (wearableInterval) {
+                    clearInterval(wearableInterval);
+                    wearableInterval = null;
+                }
+            }
+        }
+
+        function startWearableUpdates() {
+            updateWearableData(); // Update immediately
+            wearableInterval = setInterval(updateWearableData, 5000); // Update every 5 seconds
+        }
+
+        function updateWearableData() {
+            if (!wearableConnected) return;
+            
+            // Generate realistic random values
+            const hr = 70 + Math.floor(Math.random() * 20);
+            const currentSteps = parseInt(document.getElementById('steps').textContent.replace(/,/g, '')) || 6542;
+            const steps = currentSteps + Math.floor(Math.random() * 50);
+            const spo2 = 95 + Math.floor(Math.random() * 4);
+            const sleepHours = 7;
+            const sleepMins = Math.floor(Math.random() * 60);
+            
+            document.getElementById('heartRate').textContent = hr;
+            document.getElementById('steps').textContent = steps.toLocaleString();
+            document.getElementById('spo2').textContent = spo2 + '%';
+            document.getElementById('sleep').textContent = `${sleepHours}h ${sleepMins}m`;
+            
+            // Save to localStorage
+            localStorage.setItem('wearableData', JSON.stringify({ hr, steps, spo2, sleep: `${sleepHours}h ${sleepMins}m` }));
+        }
+
+        /* ============================================
+           11. NEARBY HOSPITALS WITH GEOLOCATION
+           ============================================ */
+        function findNearbyHospitals() {
+            const statusDiv = document.getElementById('locationStatus');
+            const messageDiv = document.getElementById('locationMessage');
+            
+            statusDiv.style.display = 'block';
+            messageDiv.textContent = '📍 Getting your location...';
+
+            if (!navigator.geolocation) {
+                messageDiv.textContent = '⚠️ Geolocation not supported. Showing sample hospitals.';
+                displayHospitals(null);
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    const { latitude, longitude } = position.coords;
+                    messageDiv.innerHTML = `✅ Location obtained: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+                    displayHospitals({ latitude, longitude });
+                },
+                error => {
+                    messageDiv.textContent = '⚠️ Location access denied. Showing sample hospitals.';
+                    displayHospitals(null);
+                }
+            );
+        }
+
+        function displayHospitals(location) {
+            const listDiv = document.getElementById('hospitalList');
+            
+            const hospitals = mockHospitals.map((hospital, idx) => {
+                let distance = '2-5 km';
+                let mapsUrl = '#';
+                
+                if (location) {
+                    // Calculate mock distance (in real app, would use actual calculation)
+                    distance = (1.5 + Math.random() * 4).toFixed(1) + ' km';
+                    mapsUrl = `https://www.google.com/maps/dir/${location.latitude},${location.longitude}/${hospital.name.replace(/ /g, '+')}`;
+                } else {
+                    mapsUrl = `https://www.google.com/maps/search/${hospital.name.replace(/ /g, '+')}`;
+                }
+                
+                return { ...hospital, distance, mapsUrl };
+            });
+
+            // Sort by distance
+            hospitals.sort((a, b) => parseFloat(a.distance) - parseFloat(b.distance));
+
+            listDiv.innerHTML = hospitals.map(h => `
+                <div class="hospital-card">
+                    <div class="hospital-icon">🏥</div>
+                    <div class="hospital-info">
+                        <h3>${h.name}</h3>
+                        <p style="color: var(--text-secondary);">${h.address}</p>
+                        <p style="margin-top: 0.5rem;">
+                            <a href="tel:${h.phone}" style="color: var(--accent-color); text-decoration: none;">
+                                📞 ${h.phone}
+                            </a>
+                        </p>
+                    </div>
+                    <div style="text-align: right;">
+                        <p class="hospital-distance" style="font-size: 1.2rem; margin-bottom: 1rem;">📍 ${h.distance}</p>
+                        <a href="${h.mapsUrl}" target="_blank" class="btn" style="display: inline-block; text-decoration: none; padding: 0.5rem 1rem; font-size: 0.9rem;">
+                            🗺️ Open in Maps
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        /* ============================================
+           12. PRIVACY - EXPORT/IMPORT/DELETE DATA
+           ============================================ */
+        function exportData() {
+            const data = {
+                userName: localStorage.getItem('userName'),
+                reminders: localStorage.getItem('reminders'),
+                savedTips: localStorage.getItem('savedTips'),
+                healthScore: localStorage.getItem('healthScore'),
+                wearableConnected: localStorage.getItem('wearableConnected'),
+                wearableData: localStorage.getItem('wearableData'),
+                feedback: localStorage.getItem('feedback'),
+                exportDate: new Date().toISOString()
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `healthcheck-backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showToast('✅ Data exported successfully!');
+        }
+
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = event => {
+                    try {
+                        const data = JSON.parse(event.target.result);
+                        
+                        if (data.userName) localStorage.setItem('userName', data.userName);
+                        if (data.reminders) localStorage.setItem('reminders', data.reminders);
+                        if (data.savedTips) localStorage.setItem('savedTips', data.savedTips);
+                        if (data.healthScore) localStorage.setItem('healthScore', data.healthScore);
+                        if (data.wearableConnected) localStorage.setItem('wearableConnected', data.wearableConnected);
+                        if (data.wearableData) localStorage.setItem('wearableData', data.wearableData);
+                        if (data.feedback) localStorage.setItem('feedback', data.feedback);
+                        
+                        showToast('✅ Data imported successfully! Refreshing page...');
+                        setTimeout(() => location.reload(), 2000);
+                    } catch (error) {
+                        showToast('⚠️ Invalid file format');
+                    }
+                };
+                
+                reader.readAsText(file);
+            };
+            
+            input.click();
+        }
+
+        function clearAllData() {
+            if (confirm('⚠️ Are you sure you want to delete ALL your data? This cannot be undone.')) {
+                localStorage.clear();
+                showToast('✅ All data deleted. Refreshing page...');
+                setTimeout(() => location.reload(), 2000);
+            }
+        }
+
+        /* ============================================
+           13. FEEDBACK SYSTEM
+           ============================================ */
+        function setRating(rating) {
+            selectedRating = rating;
+            const stars = document.querySelectorAll('.star');
+            stars.forEach((star, idx) => {
+                if (idx < rating) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
+                }
+            });
+        }
+
+        function submitFeedback() {
+            const comment = document.getElementById('feedbackComment').value.trim();
+            
+            if (selectedRating === 0) {
+                showToast('⚠️ Please select a rating');
+                return;
+            }
+
+            const feedback = {
+                rating: selectedRating,
+                comment,
+                date: new Date().toISOString()
+            };
+
+            const allFeedback = JSON.parse(localStorage.getItem('feedback') || '[]');
+            allFeedback.push(feedback);
+            localStorage.setItem('feedback', JSON.stringify(allFeedback));
+
+            // Reset form
+            document.getElementById('feedbackComment').value = '';
+            selectedRating = 0;
+            document.querySelectorAll('.star').forEach(star => star.classList.remove('active'));
+
+            showToast('🎉 Thank you for your feedback!');
+        }
+
+        /* ============================================
+           UTILITY FUNCTIONS
+           ============================================ */
+        function showToast(message) {
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) existingToast.remove();
+
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Keyboard accessibility for cards
+        document.querySelectorAll('.wellness-card, .symptom-tag').forEach(element => {
+            element.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.click();
+                }
+            });
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        /* ============================================
+           Load saved health score on page load
+           ============================================ */
+        const savedScore = JSON.parse(localStorage.getItem('healthScore'));
+        if (savedScore) {
+            document.getElementById('sleepHours').value = savedScore.sleep || 7;
+            document.getElementById('waterIntake').value = savedScore.water || 6;
+            document.getElementById('activityMins').value = savedScore.activity || 30;
+            document.getElementById('stressLevel').value = savedScore.stress || 5;
+            calculateHealthScore();
+        }
+
+        /* ============================================
+           Load saved wearable data
+           ============================================ */
+        const savedWearable = JSON.parse(localStorage.getItem('wearableData'));
+        if (savedWearable && wearableConnected) {
+            document.getElementById('heartRate').textContent = savedWearable.hr || 78;
+            document.getElementById('steps').textContent = savedWearable.steps?.toLocaleString() || '6,542';
+            document.getElementById('spo2').textContent = savedWearable.spo2 || '97%';
+            document.getElementById('sleep').textContent = savedWearable.sleep || '7h 15m';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community & Wellness Hub - HealthCheck AI</title>
+    <link href="community.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+<!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">Bharat Care AI</div>
+        <ul class="nav-links">
+           <li><a href="home.html">Home</a></li>
+            <li><a href="mytest.html">My Heath Test</a></li>
+            <li><a href="selfcheck.html">Self Check</a></li>
+            <li><a href="profile.html">Profile</a></li>
+            <li><a href="community.html">Community</a></li>
+        </ul>
+    </nav>
+
+        <div class="header">
+            <h1>🌟 Community & Wellness Hub</h1>
+            <p>Connect, share, and grow with your health journey.</p>
+            <button class="btn-primary" onclick="openCreatePostModal()">✨ Create Post</button>
+        </div>
+
+        <div class="card">
+            <h2 class="section-title">🏃‍♀️ Health Challenges</h2>
+            <div class="challenges-grid" id="challengesGrid"></div>
+        </div>
+
+        <div class="card">
+            <h2 class="section-title">🔥 Your Streak & Achievements</h2>
+            <div class="streak-section">
+                <div>
+                    <div class="streak-circle">
+                        <svg width="200" height="200">
+                            <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(0,229,255,0.2)" stroke-width="10"/>
+                            <circle id="progressCircle" class="circle-progress" cx="100" cy="100" r="90" fill="none" stroke="url(#gradient)" stroke-width="10" stroke-dasharray="565.48" stroke-dashoffset="565.48" stroke-linecap="round"/>
+                            <defs>
+                                <linearGradient id="gradient">
+                                    <stop offset="0%" stop-color="#00e5ff"/>
+                                    <stop offset="100%" stop-color="#4dd0e1"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                        <div class="streak-text">
+                            <div class="streak-days" id="streakDays">0</div>
+                            <div style="font-size: 0.9em; opacity: 0.8;">/ 7 Days</div>
+                        </div>
+                    </div>
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button class="btn-primary" onclick="claimDailyStreak()">🔥 Claim Daily Streak</button>
+                    </div>
+                </div>
+                <div>
+                    <h3 style="margin-bottom: 20px;">🏆 Achievements</h3>
+                    <div class="achievements-grid" id="achievementsGrid"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="section-title">📖 Health Stories Feed</h2>
+            <div id="postsFeed"></div>
+        </div>
+    </div>
+
+    <!-- Create Post Modal -->
+    <div id="createPostModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="color: #00e5ff;">Create New Post</h2>
+                <button class="modal-close" onclick="closeCreatePostModal()">✕</button>
+            </div>
+            <div class="form-group">
+                <label>Category</label>
+                <select id="postCategory" class="form-control">
+                    <option>Fitness</option>
+                    <option>Mental Health</option>
+                    <option>Nutrition</option>
+                    <option>Success Story</option>
+                    <option>Question</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Your Story</label>
+                <textarea id="postContent" class="form-control" rows="5" placeholder="Share your health journey..."></textarea>
+            </div>
+            <button class="btn-primary" onclick="createPost()">Post to Community</button>
+        </div>
+    </div>
+    <script src="community.js"></script>
+</body>
+</html>
+

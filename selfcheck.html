@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disease Self-Check</title>
+    <style>
+        /* --- COLOR THEME: Aqua Neon Medical UI --- */
+        :root {
+            --bg-body: #0d1117;
+            --bg-card: #161b22;
+            --bg-card-alt: rgba(22, 27, 34, 0.8);
+            --primary: #4dd0e1;
+            --primary-dark: #26c6da;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --border-light: rgba(77, 208, 225, 0.3);
+            --border-strong: rgba(77, 208, 225, 0.6);
+            --accent-glow: rgba(77, 208, 225, 0.4);
+            --hover-glow: rgba(77, 208, 225, 0.6);
+            --success: #4caf50;
+            --success-bg: rgba(76, 175, 80, 0.2);
+            --warning: #ffc107;
+            --warning-bg: rgba(255, 193, 7, 0.2);
+            --danger: #f44336;
+            --danger-bg: rgba(244, 67, 54, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-body);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        /* ============================================
+           NAVBAR
+           ============================================ */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(13, 17, 23, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo {
+            /* font-size: 30px;
+            font-weight: 700;
+            color: var(--accent-color);
+            text-shadow: 0 0 20px var(--shadow-glow); */
+            font-size: 30px;
+            font-weight: 700;
+            color: #4dd0e1;
+            text-shadow: 0 0 20px rgba(77, 208, 225, 0.6); 
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-color);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-color);
+            transition: width 0.3s;
+            box-shadow: 0 0 10px var(--accent-color);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+
+        /* Header */
+        .header {
+            background: rgba(13, 17, 23, 0.95);
+            border-bottom: 1px solid var(--border-light);
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            color: var(--primary);
+            font-size: 24px;
+            text-align: center;
+            text-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .back-btn {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: var(--primary);
+            color: var(--bg-body);
+            box-shadow: 0 0 20px var(--hover-glow);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Disease Grid */
+        .disease-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .disease-card {
+            background: var(--bg-card-alt);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .disease-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+
+        .disease-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--border-strong);
+            box-shadow: 0 8px 30px var(--accent-glow);
+        }
+
+        .disease-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .disease-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .disease-card h3 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+
+        .disease-card p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Question Screen */
+        .question-container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .progress-bar {
+            background: var(--bg-card);
+            border-radius: 10px;
+            height: 8px;
+            margin: 20px 0;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            transition: width 0.3s;
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .question-card {
+            background: var(--bg-card-alt);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 40px;
+            margin: 30px 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .question-number {
+            color: var(--primary);
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-size: 22px;
+            color: var(--text-primary);
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .answer-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .answer-btn {
+            flex: 1;
+            padding: 16px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 2px solid var(--border-light);
+            background: transparent;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .answer-btn.yes:hover {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+            box-shadow: 0 0 25px rgba(76, 175, 80, 0.5);
+        }
+
+        .answer-btn.no:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: var(--bg-body);
+            box-shadow: 0 0 25px var(--hover-glow);
+        }
+
+        /* Result Screen */
+        .result-container {
+            max-width: 700px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .result-card {
+            background: var(--bg-card-alt);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 50px 40px;
+            margin: 30px 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .result-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        .result-title {
+            font-size: 28px;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .result-message {
+            font-size: 18px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+
+        .disclaimer {
+            background: var(--warning-bg);
+            border: 1px solid var(--warning);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .disclaimer-title {
+            color: var(--warning);
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .disclaimer-text {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* Risk Meter Styles */
+        .risk-meter {
+            margin: 30px 0;
+            padding: 25px;
+            background: rgba(77, 208, 225, 0.05);
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+        }
+
+        .risk-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .risk-percentage {
+            font-size: 48px;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 10px 0;
+            text-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .risk-bar {
+            width: 100%;
+            height: 20px;
+            background: var(--bg-card);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 15px 0;
+            border: 1px solid var(--border-light);
+        }
+
+        .risk-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: all 1s ease;
+            box-shadow: 0 0 15px currentColor;
+        }
+
+        .risk-fill.low {
+            background: linear-gradient(90deg, var(--success), #66bb6a);
+            color: var(--success);
+        }
+
+        .risk-fill.moderate {
+            background: linear-gradient(90deg, var(--warning), #ffca28);
+            color: var(--warning);
+        }
+
+        .risk-fill.high {
+            background: linear-gradient(90deg, var(--danger), #ef5350);
+            color: var(--danger);
+        }
+
+        .risk-status {
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .risk-status.low {
+            color: var(--success);
+            background: var(--success-bg);
+        }
+
+        .risk-status.moderate {
+            color: var(--warning);
+            background: var(--warning-bg);
+        }
+
+        .risk-status.high {
+            color: var(--danger);
+            background: var(--danger-bg);
+        }
+
+        .suggestions {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 25px 0;
+            text-align: left;
+        }
+
+        .suggestions h3 {
+            color: var(--primary);
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .suggestions ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .suggestions li {
+            color: var(--text-secondary);
+            font-size: 15px;
+            line-height: 1.8;
+            margin: 10px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .suggestions li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .alert-box {
+            background: var(--danger-bg);
+            border: 2px solid var(--danger);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 25px 0;
+            animation: pulse 2s infinite;
+        }
+
+        .alert-box h3 {
+            color: var(--danger);
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .alert-box p {
+            color: var(--text-primary);
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(244, 67, 54, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(244, 67, 54, 0.5); }
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .glow-btn {
+            flex: 1;
+            padding: 16px 32px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 2px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .glow-btn:hover {
+            background: var(--primary);
+            color: var(--bg-body);
+            box-shadow: 0 0 25px var(--hover-glow);
+        }
+
+        .glow-btn.primary {
+            background: var(--primary);
+            color: var(--bg-body);
+        }
+
+        .glow-btn.primary:hover {
+            box-shadow: 0 0 30px var(--hover-glow);
+            transform: translateY(-2px);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(13, 17, 23, 0.98);
+            border-top: 1px solid var(--border-light);
+            padding: 12px 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-items {
+            display: flex;
+            justify-content: space-around;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-item:hover {
+            color: var(--primary);
+            background: rgba(77, 208, 225, 0.1);
+        }
+
+        .nav-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        .nav-label {
+            font-size: 12px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .disease-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .question-card {
+                padding: 30px 20px;
+            }
+
+            .result-card {
+                padding: 40px 20px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="logo">Bharat Care AI</div>
+        <ul class="nav-links">
+            <li><a href="home.html">Home</a></li>
+            <li><a href="mytest.html" class="active">My Heath Test</a></li>
+            <li><a href="selfcheck.html">Self Check</a></li> 
+            <li><a href="profile.html">Profile</a></li>
+            <li><a href="community.html">Community</a></li>
+        </ul>
+    </nav>
+    <!-- Header -->
+    <div class="header">
+        <button class="back-btn hidden" id="backBtn">← Back</button>
+        <h1 id="headerTitle">Disease Self-Check</h1>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Disease List Screen -->
+        <div id="diseaseListScreen">
+            <div class="disease-grid" id="diseaseGrid"></div>
+        </div>
+
+        <!-- Question Screen -->
+        <div id="questionScreen" class="hidden">
+            <div class="question-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressBar"></div>
+                </div>
+                <div class="question-card">
+                    <div class="question-number" id="questionNumber"></div>
+                    <div class="question-text" id="questionText"></div>
+                    <div class="answer-buttons">
+                        <button class="answer-btn yes" onclick="answerQuestion(true)">Yes</button>
+                        <button class="answer-btn no" onclick="answerQuestion(false)">No</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="resultScreen" class="hidden">
+            <div class="result-container">
+                <div class="result-card">
+                    <div class="result-icon" id="resultIcon">ℹ️</div>
+                    <h2 class="result-title" id="resultTitle">Assessment Complete</h2>
+                    
+                    <!-- Risk Percentage Display -->
+                    <div class="risk-meter">
+                        <div class="risk-label">Risk Assessment</div>
+                        <div class="risk-percentage" id="riskPercentage">0%</div>
+                        <div class="risk-bar">
+                            <div class="risk-fill" id="riskFill"></div>
+                        </div>
+                        <div class="risk-status" id="riskStatus"></div>
+                    </div>
+                    
+                    <p class="result-message" id="resultMessage"></p>
+                    
+                    <div class="suggestions" id="suggestions"></div>
+                    
+                    <div class="disclaimer">
+                        <div class="disclaimer-title">⚠️ Important Notice</div>
+                        <div class="disclaimer-text">
+                            This tool is for informational purposes only and does not provide medical diagnosis or advice. Always consult with qualified healthcare professionals for accurate diagnosis and treatment.
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="glow-btn" onclick="goToHome()">Check Another</button>
+                        <button class="glow-btn primary" onclick="goToHome()">Done</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Disease Data with Questions (20-25 questions each)
+        const diseases = {
+            diabetes: {
+                name: 'Diabetes',
+                icon: '🩸',
+                description: 'Blood sugar level monitoring and symptoms',
+                questions: [
+                    'Do you feel excessively thirsty throughout the day?',
+                    'Do you urinate more frequently than usual?',
+                    'Do you feel tired or fatigued often?',
+                    'Do you experience blurred vision?',
+                    'Are you feeling hungry more often than usual?',
+                    'Do you notice slow healing of cuts or wounds?',
+                    'Have you experienced unexplained weight loss recently?',
+                    'Do you have numbness or tingling in your hands or feet?',
+                    'Do you get frequent infections?',
+                    'Do you have dry, itchy skin?',
+                    'Do you experience frequent yeast infections?',
+                    'Do you feel irritable or have mood changes?',
+                    'Do you have a family history of diabetes?',
+                    'Are you experiencing erectile dysfunction (if male)?',
+                    'Do you have darkened skin areas (neck, armpits)?',
+                    'Do you feel excessively sleepy after meals?',
+                    'Do you have difficulty concentrating?',
+                    'Are you over 45 years of age?',
+                    'Do you have high blood pressure?',
+                    'Is your waist circumference larger than recommended?',
+                    'Do you have a sedentary lifestyle?',
+                    'Do you experience stomach problems or nausea?',
+                    'Do you have increased appetite with weight loss?',
+                    'Do you feel weak or shaky between meals?',
+                    'Have you noticed changes in your menstrual cycle (if female)?'
+                ]
+            },
+            heartAttack: {
+                name: 'Heart Attack',
+                icon: '❤️',
+                description: 'Cardiovascular health symptom checker',
+                questions: [
+                    'Do you feel chest discomfort or pressure?',
+                    'Are you experiencing pain in your arms, neck, or jaw?',
+                    'Do you feel short of breath?',
+                    'Are you experiencing unusual fatigue?',
+                    'Do you feel nauseous or lightheaded?',
+                    'Are you experiencing cold sweats?',
+                    'Do you have pain that spreads to your shoulder?',
+                    'Do you feel pressure or squeezing in your chest?',
+                    'Are you experiencing indigestion-like discomfort?',
+                    'Do you have sudden dizziness or fainting?',
+                    'Are you feeling anxious or having a sense of doom?',
+                    'Do you have pain in your upper back?',
+                    'Are you experiencing irregular heartbeat?',
+                    'Do you have a family history of heart disease?',
+                    'Do you smoke or have you smoked in the past?',
+                    'Do you have high cholesterol levels?',
+                    'Are you over 50 years of age?',
+                    'Do you have diabetes?',
+                    'Are you overweight or obese?',
+                    'Do you experience chest pain during physical activity?',
+                    'Do you have high blood pressure?',
+                    'Are you experiencing weakness in your arms?',
+                    'Do you feel confused or disoriented?',
+                    'Are your symptoms getting worse over time?',
+                    'Do you have a history of heart problems?'
+                ]
+            },
+            thyroid: {
+                name: 'Thyroid',
+                icon: '🦋',
+                description: 'Thyroid function symptom assessment',
+                questions: [
+                    'Do you feel unusually tired or fatigued?',
+                    'Have you noticed unexpected weight changes?',
+                    'Do you experience mood swings or irritability?',
+                    'Are you sensitive to temperature changes?',
+                    'Do you notice changes in your hair or skin?',
+                    'Are you experiencing irregular heartbeat?',
+                    'Do you have difficulty sleeping?',
+                    'Are you experiencing muscle weakness?',
+                    'Do you have constipation or digestive issues?',
+                    'Are you experiencing memory problems?',
+                    'Do you have a swelling in your neck?',
+                    'Are you experiencing depression or anxiety?',
+                    'Do you have dry skin or brittle nails?',
+                    'Are you experiencing heavy or irregular periods (if female)?',
+                    'Do you have difficulty concentrating?',
+                    'Are you experiencing increased sweating?',
+                    'Do you have trembling hands?',
+                    'Are you feeling nervous or jittery?',
+                    'Do you have a family history of thyroid problems?',
+                    'Are you experiencing hair loss?',
+                    'Do you feel cold even in warm environments?',
+                    'Do you have puffy face or swelling?',
+                    'Are you experiencing changes in appetite?',
+                    'Do you have hoarse voice?',
+                    'Are you experiencing fertility issues?'
+                ]
+            },
+            asthma: {
+                name: 'Asthma',
+                icon: '🫁',
+                description: 'Respiratory health monitoring',
+                questions: [
+                    'Do you have difficulty breathing?',
+                    'Do you experience chest tightness?',
+                    'Are you wheezing when breathing?',
+                    'Do you have a persistent cough?',
+                    'Do your symptoms worsen at night?',
+                    'Do you feel short of breath during activities?',
+                    'Do you wake up at night due to breathing problems?',
+                    'Do you cough or wheeze after exercise?',
+                    'Are you experiencing rapid breathing?',
+                    'Do you have allergies to dust, pollen, or pets?',
+                    'Do you use your rescue inhaler frequently?',
+                    'Do you avoid physical activities due to breathing issues?',
+                    'Do you have a family history of asthma?',
+                    'Are your symptoms worse in certain seasons?',
+                    'Do you experience difficulty talking during episodes?',
+                    'Do you feel anxious during breathing difficulties?',
+                    'Do you have eczema or hay fever?',
+                    'Are you exposed to smoke or air pollution?',
+                    'Do you experience chest tightness when laughing?',
+                    'Do cold air or weather changes trigger symptoms?',
+                    'Do you have trouble sleeping due to coughing?',
+                    'Are you experiencing fatigue from breathing difficulties?',
+                    'Do strong odors or perfumes trigger symptoms?',
+                    'Have you had respiratory infections recently?',
+                    'Do you feel breathless even at rest?'
+                ]
+            },
+            dengue: {
+                name: 'Dengue',
+                icon: '🦟',
+                description: 'Dengue fever symptom checker',
+                questions: [
+                    'Are you experiencing high fever (104°F/40°C)?',
+                    'Do you have severe headaches?',
+                    'Are you experiencing pain behind your eyes?',
+                    'Do you have muscle or joint pain?',
+                    'Do you notice any skin rashes?',
+                    'Are you feeling nauseous or experiencing vomiting?',
+                    'Have you been bitten by mosquitoes recently?',
+                    'Do you have severe abdominal pain?',
+                    'Are you experiencing bleeding gums or nose?',
+                    'Do you have blood in your vomit or stool?',
+                    'Are you feeling extremely tired or restless?',
+                    'Do you have rapid breathing or difficulty breathing?',
+                    'Do you notice cold or clammy skin?',
+                    'Are you experiencing persistent vomiting?',
+                    'Do you have decreased urination?',
+                    'Are you living in or traveled to dengue-prone areas?',
+                    'Do you have a low platelet count (if tested)?',
+                    'Are you experiencing bone pain or body aches?',
+                    'Do you have swelling or fluid accumulation?',
+                    'Are you feeling confused or irritable?',
+                    'Do you have loss of appetite?',
+                    'Are you experiencing bleeding under the skin (petechiae)?',
+                    'Do you have weakness or dizziness?',
+                    'Are your symptoms worsening after fever reduces?',
+                    'Do you have a history of dengue infection?'
+                ]
+            },
+            breastCancer: {
+                name: 'Breast Cancer',
+                icon: '🎀',
+                description: 'Breast health awareness checker',
+                questions: [
+                    'Have you noticed any lumps in your breast?',
+                    'Do you see changes in breast shape or size?',
+                    'Have you noticed skin changes on your breast?',
+                    'Are you experiencing unusual nipple discharge?',
+                    'Do you have persistent breast pain?',
+                    'Have you noticed dimpling of breast skin?',
+                    'Is there redness or scaliness of breast skin?',
+                    'Have you noticed nipple retraction or inversion?',
+                    'Do you feel lumps in your underarm area?',
+                    'Is there thickening of breast tissue?',
+                    'Do you have a family history of breast cancer?',
+                    'Are you over 40 years of age?',
+                    'Have you experienced early menstruation (before 12)?',
+                    'Did you have late menopause (after 55)?',
+                    'Have you never had children or had first child after 30?',
+                    'Do you have dense breast tissue?',
+                    'Have you used hormone replacement therapy?',
+                    'Do you consume alcohol regularly?',
+                    'Are you overweight or obese?',
+                    'Do you have a sedentary lifestyle?',
+                    'Have you noticed swelling in or around breast?',
+                    'Is there an orange-peel texture on breast skin?',
+                    'Do you have persistent itching of the nipple?',
+                    'Have genetic mutations (BRCA1/BRCA2) been detected?',
+                    'Have you noticed any asymmetry between breasts?'
+                ]
+            },
+            kidneyInfection: {
+                name: 'Kidney Infection',
+                icon: '🫘',
+                description: 'Kidney health symptom assessment',
+                questions: [
+                    'Are you experiencing back or side pain?',
+                    'Do you feel burning during urination?',
+                    'Are you urinating more frequently?',
+                    'Do you have fever or chills?',
+                    'Do you feel nauseous or experience vomiting?',
+                    'Have you noticed cloudy or bloody urine?',
+                    'Do you have pain in your lower abdomen?',
+                    'Are you experiencing strong-smelling urine?',
+                    'Do you have an urgent need to urinate?',
+                    'Are you experiencing fatigue or weakness?',
+                    'Do you have pelvic pain (if female)?',
+                    'Are you experiencing confusion or mental changes?',
+                    'Do you have a history of urinary tract infections?',
+                    'Are you experiencing painful urination?',
+                    'Do you have diabetes or kidney stones?',
+                    'Are you pregnant currently?',
+                    'Do you have a weakened immune system?',
+                    'Have you used a urinary catheter recently?',
+                    'Do you have difficulty emptying bladder completely?',
+                    'Are you experiencing night sweats?',
+                    'Do you have loss of appetite?',
+                    'Are you experiencing shaking or shivering?',
+                    'Do you have swelling in legs or feet?',
+                    'Have you noticed decreased urine output?',
+                    'Are you experiencing generalized body pain?'
+                ]
+            },
+            migraine: {
+                name: 'Migraine',
+                icon: '🧠',
+                description: 'Headache and migraine symptom tracker',
+                questions: [
+                    'Do you have severe, throbbing headaches?',
+                    'Are you sensitive to light or sound?',
+                    'Do you experience nausea or vomiting?',
+                    'Do you see visual disturbances or auras?',
+                    'Does physical activity worsen your headache?',
+                    'Does your headache last for several hours or days?',
+                    'Do you have one-sided head pain?',
+                    'Do you experience blurred vision?',
+                    'Do you see flashing lights or blind spots?',
+                    'Do you feel tingling or numbness?',
+                    'Do you have difficulty speaking?',
+                    'Do you experience dizziness or vertigo?',
+                    'Do you have a family history of migraines?',
+                    'Are you experiencing neck pain or stiffness?',
+                    'Do certain foods trigger your headaches?',
+                    'Does stress worsen your headaches?',
+                    'Do hormonal changes affect your headaches (if female)?',
+                    'Do you experience fatigue before or after headaches?',
+                    'Are you sensitive to smells during headaches?',
+                    'Do you have sleep disturbances?',
+                    'Do you experience mood changes before headaches?',
+                    'Do weather changes trigger your headaches?',
+                    'Do you have difficulty concentrating during episodes?',
+                    'Do you experience frequent yawning before headaches?',
+                    'Have you noticed triggers like bright lights or loud noises?'
+                ]
+            },
+            anemia: {
+                name: 'Anemia',
+                icon: '🩸',
+                description: 'Blood health and energy level checker',
+                questions: [
+                    'Do you feel tired or weak frequently?',
+                    'Do you appear pale or have pale skin?',
+                    'Do you experience dizziness or lightheadedness?',
+                    'Do you have cold hands or feet?',
+                    'Do you experience shortness of breath?',
+                    'Do you have frequent headaches?',
+                    'Do you have a rapid or irregular heartbeat?',
+                    'Do you have chest pain?',
+                    'Do you experience brittle nails?',
+                    'Do you have cravings for non-food items (ice, dirt)?',
+                    'Do you have a sore or swollen tongue?',
+                    'Do you experience difficulty concentrating?',
+                    'Do you have poor appetite?',
+                    'Are you experiencing hair loss?',
+                    'Do you have ringing in your ears?',
+                    'Do you feel irritable or depressed?',
+                    'Do you have a heavy menstrual flow (if female)?',
+                    'Do you follow a vegetarian or vegan diet?',
+                    'Have you had blood loss recently?',
+                    'Do you have digestive issues or stomach ulcers?',
+                    'Are you pregnant or breastfeeding?',
+                    'Do you have a family history of anemia?',
+                    'Do you experience leg cramps?',
+                    'Do you have difficulty performing daily activities?',
+                    'Have you noticed decreased exercise tolerance?'
+                ]
+            }
+        };
+
+        let currentDisease = null;
+        let currentQuestionIndex = 0;
+        let answers = [];
+
+        // Initialize App
+        function init() {
+            renderDiseaseGrid();
+        }
+
+        // Render Disease Grid
+        function renderDiseaseGrid() {
+            const grid = document.getElementById('diseaseGrid');
+            grid.innerHTML = '';
+
+            Object.keys(diseases).forEach(key => {
+                const disease = diseases[key];
+                const card = document.createElement('div');
+                card.className = 'disease-card';
+                card.onclick = () => startAssessment(key);
+                card.innerHTML = `
+                    <span class="disease-icon">${disease.icon}</span>
+                    <h3>${disease.name}</h3>
+                    <p>${disease.description}</p>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Start Assessment
+        function startAssessment(diseaseKey) {
+            currentDisease = diseases[diseaseKey];
+            currentQuestionIndex = 0;
+            answers = [];
+
+            document.getElementById('diseaseListScreen').classList.add('hidden');
+            document.getElementById('questionScreen').classList.remove('hidden');
+            document.getElementById('backBtn').classList.remove('hidden');
+            document.getElementById('headerTitle').textContent = currentDisease.name + ' Check';
+
+            showQuestion();
+        }
+
+        // Show Question
+        function showQuestion() {
+            const question = currentDisease.questions[currentQuestionIndex];
+            const totalQuestions = currentDisease.questions.length;
+            const progress = ((currentQuestionIndex + 1) / totalQuestions) * 100;
+
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('questionNumber').textContent = 
+                `Question ${currentQuestionIndex + 1} of ${totalQuestions}`;
+            document.getElementById('questionText').textContent = question;
+        }
+
+        // Answer Question
+        function answerQuestion(answer) {
+            answers.push(answer);
+
+            if (currentQuestionIndex < currentDisease.questions.length - 1) {
+                currentQuestionIndex++;
+                showQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        // Show Result
+        function showResult() {
+            document.getElementById('questionScreen').classList.add('hidden');
+            document.getElementById('resultScreen').classList.remove('hidden');
+            document.getElementById('headerTitle').textContent = 'Assessment Result';
+            
+            // Calculate risk percentage
+            const yesCount = answers.filter(a => a === true).length;
+            const totalQuestions = answers.length;
+            const riskPercentage = Math.round((yesCount / totalQuestions) * 100);
+            
+            // Determine risk level
+            let riskLevel, riskColor, riskIcon, message, suggestions;
+            
+            if (riskPercentage <= 33) {
+                riskLevel = 'low';
+                riskColor = 'low';
+                riskIcon = '✅';
+                message = `Based on your responses, you show a low risk profile for ${currentDisease.name}. However, it's always good to maintain healthy habits and monitor your wellbeing.`;
+                suggestions = getLowRiskSuggestions(currentDisease.name);
+            } else if (riskPercentage <= 66) {
+                riskLevel = 'moderate';
+                riskColor = 'moderate';
+                riskIcon = '⚠️';
+                message = `Based on your responses, you show a moderate risk profile for ${currentDisease.name}. We recommend monitoring your symptoms and considering a consultation with a healthcare provider.`;
+                suggestions = getModerateRiskSuggestions(currentDisease.name);
+            } else {
+                riskLevel = 'high';
+                riskColor = 'high';
+                riskIcon = '🚨';
+                message = `Based on your responses, you show a high risk profile for ${currentDisease.name}. We strongly recommend consulting with a healthcare professional as soon as possible for proper evaluation and guidance.`;
+                suggestions = getHighRiskSuggestions(currentDisease.name);
+            }
+            
+            // Update UI
+            document.getElementById('resultIcon').textContent = riskIcon;
+            document.getElementById('resultTitle').textContent = `${currentDisease.name} Assessment`;
+            document.getElementById('riskPercentage').textContent = riskPercentage + '%';
+            document.getElementById('riskFill').style.width = riskPercentage + '%';
+            document.getElementById('riskFill').className = 'risk-fill ' + riskColor;
+            document.getElementById('riskStatus').textContent = riskLevel.toUpperCase() + ' RISK';
+            document.getElementById('riskStatus').className = 'risk-status ' + riskColor;
+            document.getElementById('resultMessage').textContent = message;
+            
+            // Display suggestions
+            const suggestionsDiv = document.getElementById('suggestions');
+            if (riskLevel === 'high') {
+                suggestionsDiv.innerHTML = `
+                    <div class="alert-box">
+                        <h3>⚠️ Immediate Action Recommended</h3>
+                        <p>${suggestions}</p>
+                    </div>
+                `;
+            } else {
+                suggestionsDiv.innerHTML = `
+                    <h3>💡 Recommendations</h3>
+                    <ul>
+                        ${suggestions.map(s => `<li>${s}</li>`).join('')}
+                    </ul>
+                `;
+            }
+        }
+        
+        // Low Risk Suggestions
+        function getLowRiskSuggestions(disease) {
+            const suggestions = {
+                'Diabetes': [
+                    'Maintain a balanced diet with controlled sugar intake',
+                    'Exercise regularly for at least 30 minutes daily',
+                    'Stay hydrated and monitor your weight',
+                    'Get regular health check-ups annually'
+                ],
+                'Heart Attack': [
+                    'Continue with heart-healthy diet and regular exercise',
+                    'Manage stress through relaxation techniques',
+                    'Maintain healthy blood pressure and cholesterol levels',
+                    'Avoid smoking and limit alcohol consumption'
+                ],
+                'Thyroid': [
+                    'Include iodine-rich foods in your diet',
+                    'Get adequate sleep and manage stress',
+                    'Exercise regularly to maintain metabolism',
+                    'Schedule regular thyroid function tests'
+                ],
+                'Asthma': [
+                    'Avoid known allergens and triggers',
+                    'Keep your living space clean and dust-free',
+                    'Exercise regularly but know your limits',
+                    'Monitor air quality and avoid pollution'
+                ],
+                'Dengue': [
+                    'Use mosquito repellents and protective clothing',
+                    'Eliminate standing water around your home',
+                    'Ensure windows and doors have screens',
+                    'Stay hydrated and maintain good hygiene'
+                ],
+                'Breast Cancer': [
+                    'Perform monthly self-examinations',
+                    'Maintain a healthy weight and exercise regularly',
+                    'Limit alcohol consumption',
+                    'Schedule regular mammogram screenings as recommended'
+                ],
+                'Kidney Infection': [
+                    'Drink plenty of water throughout the day',
+                    'Maintain good hygiene practices',
+                    'Avoid holding urine for long periods',
+                    'Include cranberry products in your diet'
+                ],
+                'Migraine': [
+                    'Maintain a regular sleep schedule',
+                    'Identify and avoid your trigger foods',
+                    'Manage stress through relaxation techniques',
+                    'Stay hydrated and exercise regularly'
+                ],
+                'Anemia': [
+                    'Include iron-rich foods in your diet',
+                    'Consume vitamin C to improve iron absorption',
+                    'Consider iron supplements if recommended',
+                    'Get regular blood tests to monitor levels'
+                ]
+            };
+            return suggestions[disease] || [];
+        }
+        
+        // Moderate Risk Suggestions
+        function getModerateRiskSuggestions(disease) {
+            const suggestions = {
+                'Diabetes': [
+                    'Schedule a consultation with your doctor for blood sugar testing',
+                    'Monitor your diet carefully and reduce sugar intake',
+                    'Increase physical activity to 45 minutes daily',
+                    'Keep a symptom diary to track changes'
+                ],
+                'Heart Attack': [
+                    'Consult a cardiologist for a comprehensive heart check',
+                    'Monitor your blood pressure regularly at home',
+                    'Reduce sodium intake and follow a heart-healthy diet',
+                    'Consider stress management counseling'
+                ],
+                'Thyroid': [
+                    'Get thyroid function tests (TSH, T3, T4) done soon',
+                    'Consult an endocrinologist for evaluation',
+                    'Monitor your symptoms and energy levels daily',
+                    'Avoid excessive soy products until evaluated'
+                ],
+                'Asthma': [
+                    'Consult a pulmonologist for lung function tests',
+                    'Always carry a rescue inhaler if prescribed',
+                    'Identify and avoid your specific triggers',
+                    'Consider allergy testing if not done recently'
+                ],
+                'Dengue': [
+                    'Monitor for fever and get a blood test if it develops',
+                    'Increase fluid intake significantly',
+                    'Rest adequately and avoid strenuous activities',
+                    'Seek immediate care if symptoms worsen'
+                ],
+                'Breast Cancer': [
+                    'Schedule a clinical breast examination soon',
+                    'Discuss mammogram or ultrasound with your doctor',
+                    'Document any changes you\'ve noticed',
+                    'Consider genetic counseling if family history exists'
+                ],
+                'Kidney Infection': [
+                    'See a doctor for urinalysis and kidney function tests',
+                    'Increase water intake to 8-10 glasses daily',
+                    'Avoid caffeine and alcohol temporarily',
+                    'Monitor for fever or worsening symptoms'
+                ],
+                'Migraine': [
+                    'Consult a neurologist for proper diagnosis',
+                    'Keep a detailed headache diary',
+                    'Discuss preventive medication options',
+                    'Consider imaging studies if recommended'
+                ],
+                'Anemia': [
+                    'Get a complete blood count (CBC) test done',
+                    'Consult a hematologist if symptoms persist',
+                    'Start iron supplementation under medical guidance',
+                    'Investigate potential causes of iron deficiency'
+                ]
+            };
+            return suggestions[disease] || [];
+        }
+        
+        // High Risk Suggestions
+        function getHighRiskSuggestions(disease) {
+            const messages = {
+                'Diabetes': 'Please consult a doctor immediately for blood sugar testing and evaluation. Your symptoms suggest you need urgent medical attention. Do not delay seeking professional help, as unmanaged diabetes can lead to serious complications.',
+                'Heart Attack': 'URGENT: Your symptoms may indicate a cardiac concern. Please seek immediate medical attention or visit the nearest emergency room. Do not ignore chest discomfort or related symptoms. Call emergency services if symptoms are severe.',
+                'Thyroid': 'Please schedule an urgent appointment with an endocrinologist. Severe thyroid dysfunction requires prompt medical evaluation and treatment. Get thyroid function tests done as soon as possible.',
+                'Asthma': 'Your symptoms indicate potentially severe respiratory issues. Please consult a pulmonologist urgently. If you experience severe breathing difficulty, seek emergency care immediately. Keep rescue medication accessible.',
+                'Dengue': 'URGENT: Please visit a healthcare facility immediately for dengue testing and monitoring. Severe dengue can be life-threatening and requires close medical supervision. Stay well-hydrated and seek immediate care.',
+                'Breast Cancer': 'Please schedule an urgent consultation with a breast specialist or oncologist. Early detection and evaluation are crucial. Do not delay getting a clinical examination, mammogram, or biopsy as recommended by your doctor.',
+                'Kidney Infection': 'Please seek medical attention urgently. Severe kidney infections require prompt antibiotic treatment. Visit a doctor today or go to urgent care. Untreated kidney infections can lead to serious complications.',
+                'Migraine': 'Your severe headache symptoms require urgent neurological evaluation. Please consult a neurologist as soon as possible. If you experience sudden severe headache with other symptoms, visit the emergency room.',
+                'Anemia': 'Please consult a doctor urgently for comprehensive blood tests and evaluation. Severe anemia requires prompt treatment. You may need iron therapy or investigation of underlying causes. Do not delay seeking medical care.'
+            };
+            return messages[disease] || 'Please consult a healthcare professional immediately for proper evaluation and treatment.';
+        }
+
+        // Go to Home
+        function goToHome() {
+            document.getElementById('resultScreen').classList.add('hidden');
+            document.getElementById('diseaseListScreen').classList.remove('hidden');
+            document.getElementById('backBtn').classList.add('hidden');
+            document.getElementById('headerTitle').textContent = 'Disease Self-Check';
+            currentDisease = null;
+            currentQuestionIndex = 0;
+            answers = [];
+        }
+
+        // Back Button Handler
+        document.getElementById('backBtn').onclick = function() {
+            if (!document.getElementById('resultScreen').classList.contains('hidden')) {
+                document.getElementById('resultScreen').classList.add('hidden');
+                document.getElementById('questionScreen').classList.remove('hidden');
+                document.getElementById('headerTitle').textContent = currentDisease.name + ' Check';
+                currentQuestionIndex = currentDisease.questions.length - 1;
+            } else if (!document.getElementById('questionScreen').classList.contains('hidden')) {
+                if (currentQuestionIndex > 0) {
+                    currentQuestionIndex--;
+                    answers.pop();
+                    showQuestion();
+                } else {
+                    goToHome();
+                }
+            }
+        };
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Health Test - HealthCheck AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #0d1117;
+            color: #e6edf3;
+            overflow-x: hidden;
+        }
+
+        /* Navbar */
+        .navbar {
+            position: sticky;
+            top: 0;
+            background: rgba(13, 17, 23, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1.2rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(77, 208, 225, 0.2);
+        }
+
+        .logo {
+            font-size: 30px;
+            font-weight: 700;
+            color: #4dd0e1;
+            text-shadow: 0 0 20px rgba(77, 208, 225, 0.6); 
+           
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #e6edf3;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #4dd0e1;
+            text-shadow: 0 0 15px rgba(77, 208, 225, 0.8);
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 4rem 5% 3rem;
+            animation: fadeIn 1s ease-in;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #4dd0e1, #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: #8b949e;
+            margin-bottom: 2rem;
+        }
+
+        .mode-buttons {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: 2px solid #4dd0e1;
+            background: transparent;
+            color: #4dd0e1;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .mode-btn:hover,
+        .mode-btn.active {
+            background: #4dd0e1;
+            color: #0d1117;
+            box-shadow: 0 0 30px rgba(77, 208, 225, 0.6);
+            transform: translateY(-3px);
+        }
+
+        /* Section Container */
+        .section {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 0 5%;
+            animation: fadeIn 1s ease-in;
+        }
+
+        .card {
+            background: rgba(22, 27, 34, 0.8);
+            border: 1px solid rgba(77, 208, 225, 0.3);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            border-color: rgba(77, 208, 225, 0.6);
+            box-shadow: 0 8px 32px rgba(77, 208, 225, 0.2);
+        }
+
+        .card h2 {
+            color: #4dd0e1;
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+
+        .card p {
+            color: #8b949e;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        /* Image Scanner */
+        .upload-area {
+            border: 2px dashed rgba(77, 208, 225, 0.5);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            margin-bottom: 1.5rem;
+        }
+
+        .upload-area:hover {
+            border-color: #4dd0e1;
+            background: rgba(77, 208, 225, 0.05);
+        }
+
+        .upload-area input[type="file"] {
+            display: none;
+        }
+
+        .upload-label {
+            font-size: 1.1rem;
+            color: #4dd0e1;
+            cursor: pointer;
+        }
+
+        #imagePreview {
+            margin-top: 1.5rem;
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 15px;
+            display: none;
+            box-shadow: 0 0 20px rgba(77, 208, 225, 0.3);
+        }
+
+        /* Form Inputs */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #4dd0e1;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: rgba(13, 17, 23, 0.8);
+            border: 1px solid rgba(77, 208, 225, 0.3);
+            border-radius: 10px;
+            color: #e6edf3;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4dd0e1;
+            box-shadow: 0 0 15px rgba(77, 208, 225, 0.3);
+        }
+
+        .vitals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* Buttons */
+        .glow-btn {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #4dd0e1, #26c6da);
+            border: none;
+            color: #0d1117;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Poppins', sans-serif;
+            box-shadow: 0 5px 20px rgba(77, 208, 225, 0.4);
+            display: block;
+            margin: 1.5rem auto 0;
+        }
+
+        .glow-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(77, 208, 225, 0.6);
+        }
+
+        /* Checkup Forms */
+        .checkup-form {
+            display: none;
+        }
+
+        .checkup-form.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        /* Report Styles */
+        .report-container {
+            background: linear-gradient(135deg, rgba(77, 208, 225, 0.1), rgba(77, 208, 225, 0.05));
+            border: 2px solid rgba(77, 208, 225, 0.4);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 1rem;
+        }
+
+        .report-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid rgba(77, 208, 225, 0.3);
+            padding-bottom: 1rem;
+        }
+
+        .report-header h3 {
+            color: #4dd0e1;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .report-date {
+            color: #8b949e;
+            font-size: 0.9rem;
+        }
+
+        .report-section {
+            margin-bottom: 2rem;
+        }
+
+        .report-section h4 {
+            color: #4dd0e1;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            border-left: 3px solid #4dd0e1;
+            padding-left: 1rem;
+        }
+
+        .report-item {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 0.8rem;
+            background: rgba(13, 17, 23, 0.5);
+            border-radius: 8px;
+        }
+
+        .report-item-label {
+            color: #8b949e;
+            font-size: 0.9rem;
+        }
+
+        .report-item-value {
+            color: #4dd0e1;
+            font-weight: 600;
+        }
+
+        .risk-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: 600;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .risk-low {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+            border: 1px solid #4caf50;
+        }
+
+        .risk-medium {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+            border: 1px solid #ffc107;
+        }
+
+        .risk-high {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+            border: 1px solid #f44336;
+        }
+
+        .recommendations {
+            background: rgba(77, 208, 225, 0.1);
+            border-left: 4px solid #4dd0e1;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .recommendations h5 {
+            color: #4dd0e1;
+            margin-bottom: 0.8rem;
+        }
+
+        .recommendations ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .recommendations li {
+            color: #8b949e;
+            margin-bottom: 0.5rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .recommendations li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #4dd0e1;
+        }
+
+        /* Medical Recommendations Section */
+        .medical-recommendations {
+            background: rgba(13, 17, 23, 0.6);
+            border: 2px solid rgba(77, 208, 225, 0.4);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .medical-recommendations h4 {
+            color: #4dd0e1;
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+            text-align: center;
+        }
+
+        .medical-item {
+            background: rgba(77, 208, 225, 0.05);
+            border-left: 4px solid #4dd0e1;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .medical-item:hover {
+            background: rgba(77, 208, 225, 0.1);
+            transform: translateX(5px);
+        }
+
+        .medical-item-header {
+            color: #4dd0e1;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .medical-item-detail {
+            color: #8b949e;
+            margin: 0.4rem 0;
+            font-size: 0.95rem;
+            padding-left: 1rem;
+        }
+
+        .medical-item-detail strong {
+            color: #e6edf3;
+            margin-right: 0.5rem;
+        }
+
+        .medical-note {
+            background: rgba(77, 208, 225, 0.1);
+            border: 1px solid rgba(77, 208, 225, 0.3);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            color: #4dd0e1;
+            font-size: 0.95rem;
+            text-align: center;
+        }
+
+        .urgent-banner {
+            background: rgba(244, 67, 54, 0.2);
+            border: 2px solid #f44336;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            animation: pulse 2s infinite;
+        }
+
+        .urgent-banner p {
+            color: #f44336;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(77, 208, 225, 0.2);
+            border-top: 4px solid #4dd0e1;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Disclaimer */
+        .disclaimer {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 3rem auto;
+            max-width: 1200px;
+            text-align: center;
+        }
+
+        .disclaimer p {
+            color: #ffc107;
+            font-size: 0.95rem;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .print-btn {
+            background: rgba(77, 208, 225, 0.2);
+            border: 1px solid #4dd0e1;
+            color: #4dd0e1;
+            padding: 0.7rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s;
+            margin-top: 1rem;
+            font-weight: 600;
+        }
+
+        .print-btn:hover {
+            background: #4dd0e1;
+            color: #0d1117;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                gap: 1rem;
+                font-size: 0.9rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .mode-buttons {
+                gap: 1rem;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+
+            .card h2 {
+                font-size: 1.5rem;
+            }
+
+            .vitals-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .report-item {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">Bharat Care AI</div>
+        <ul class="nav-links">
+            <li><a href="home.html">Home</a></li>
+            <li><a href="mytest.html" class="active">My Heath Test</a></li>
+            <li><a href="selfcheck.html">Self Check</a></li>
+            <li><a href="profile.html">Profile</a></li>
+            <li><a href="community.html">Community</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>🩺 Run Your AI Health Test</h1>
+        <p>Choose between a Quick or Full Checkup and let our AI analyze your health data instantly.</p>
+        <div class="mode-buttons">
+            <button class="mode-btn active" onclick="switchMode('quick')">⚡ Quick Checkup</button>
+            <button class="mode-btn" onclick="switchMode('full')">🔬 Full Checkup</button>
+        </div>
+    </section>
+
+    <!-- Image Scanner Section -->
+    <section class="section">
+        <div class="card">
+            <h2>📸 Upload Medical Image for AI Scan</h2>
+            <p>Upload your X-ray, scan, or medical report for AI-based disease detection.</p>
+            <div class="upload-area" onclick="document.getElementById('imageUpload').click()">
+                <label class="upload-label">
+                    📁 Click to upload image (JPG, PNG, JPEG)
+                </label>
+                <input type="file" id="imageUpload" accept=".jpg,.jpeg,.png" onchange="previewImage(event)">
+            </div>
+            <img id="imagePreview" alt="Preview">
+            <button class="glow-btn" onclick="analyzeImage()">🧠 Analyze Image</button>
+        </div>
+    </section>
+
+    <!-- Vitals & Symptoms Section -->
+    <section class="section">
+        <div class="card">
+            <h2>❤️ Enter Your Health Vitals</h2>
+            <div class="vitals-grid">
+                <div class="form-group">
+                    <label>Blood Pressure (BP)</label>
+                    <input type="text" id="bp" placeholder="e.g., 120/80 mmHg">
+                </div>
+                <div class="form-group">
+                    <label>Oxygen Level (SpO2)</label>
+                    <input type="text" id="spo2" placeholder="e.g., 98%">
+                </div>
+                <div class="form-group">
+                    <label>Temperature (°C)</label>
+                    <input type="text" id="temp" placeholder="e.g., 37.0">
+                </div>
+                <div class="form-group">
+                    <label>Heart Rate (bpm)</label>
+                    <input type="text" id="hr" placeholder="e.g., 72">
+                </div>
+                <div class="form-group">
+                    <label>Pulse</label>
+                    <input type="text" id="pulse" placeholder="e.g., 75">
+                </div>
+                <div class="form-group">
+                    <label>Blood Sugar (mg/dL)</label>
+                    <input type="text" id="bs" placeholder="e.g., 100">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Symptom Description</label>
+                <textarea id="symptoms" placeholder="Describe your symptoms briefly…"></textarea>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Checkup Form -->
+    <section class="section">
+        <div class="card">
+            <div id="quickCheckup" class="checkup-form active">
+                <h2>⚡ Quick Checkup</h2>
+                <div class="form-group">
+                    <label>How are you feeling today?</label>
+                    <input type="text" id="quickFeeling" placeholder="e.g., Feeling tired and weak">
+                </div>
+                <div class="form-group">
+                    <label>Any fever or chest pain recently?</label>
+                    <input type="text" id="quickFever" placeholder="Yes/No and details">
+                </div>
+                <div class="form-group">
+                    <label>Rate your energy level (1–10)</label>
+                    <input type="number" id="quickEnergy" min="1" max="10" placeholder="e.g., 6">
+                </div>
+                <button class="glow-btn" onclick="submitCheckup('quick')">✨ Submit for AI Analysis</button>
+            </div>
+
+            <!-- Full Checkup Form -->
+            <div id="fullCheckup" class="checkup-form">
+                <h2>🔬 Full Checkup</h2>
+                <div class="form-group">
+                    <label>How long have you been experiencing symptoms?</label>
+                    <input type="text" id="fullDuration" placeholder="e.g., 3 days">
+                </div>
+                <div class="form-group">
+                    <label>Do you have a history of heart or lung disease?</label>
+                    <input type="text" id="fullHistory" placeholder="Yes/No and details">
+                </div>
+                <div class="form-group">
+                    <label>Are you currently on medication?</label>
+                    <input type="text" id="fullMeds" placeholder="List medications if any">
+                </div>
+                <div class="form-group">
+                    <label>Do you have cough, breathlessness, or fatigue?</label>
+                    <input type="text" id="fullSymptoms" placeholder="Describe severity">
+                </div>
+                <div class="form-group">
+                    <label>Have you had recent blood tests or imaging scans?</label>
+                    <input type="text" id="fullTests" placeholder="When and what type?">
+                </div>
+                <div class="form-group">
+                    <label>Do you smoke or consume alcohol?</label>
+                    <input type="text" id="fullHabits" placeholder="Frequency and quantity">
+                </div>
+                <div class="form-group">
+                    <label>What's your diet like?</label>
+                    <textarea id="fullDiet" placeholder="Describe your typical daily diet"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>What's your exercise routine?</label>
+                    <textarea id="fullExercise" placeholder="Frequency and type of exercise"></textarea>
+                </div>
+                <button class="glow-btn" onclick="submitCheckup('full')">✨ Submit for AI Analysis</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Loading Animation -->
+    <section class="section">
+        <div class="loading" id="loadingAnimation">
+            <div class="spinner"></div>
+            <p style="color: #4dd0e1; font-size: 1.2rem;">🧠 AI is analyzing your data...</p>
+        </div>
+    </section>
+
+    <!-- Results Section -->
+    <section class="section">
+        <div class="card">
+            <h2>📊 AI Result Preview</h2>
+            <div id="resultsBox">
+                <p style="text-align: center; color: #8b949e; font-size: 1.1rem;">🔮 Submit your data to see AI analysis results here...</p>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Data storage
+        let userFormData = {};
+        let currentCheckupType = 'quick';
+
+        // Image Preview
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('imagePreview');
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Analyze Image
+        function analyzeImage() {
+            const preview = document.getElementById('imagePreview');
+            if (preview.style.display === 'none' || !preview.src) {
+                alert('Please upload an image first!');
+                return;
+            }
+            showLoading();
+            setTimeout(() => {
+                hideLoading();
+                collectAllData();
+                generateFakeReport();
+            }, 2000);
+        }
+
+        // Switch Checkup Mode
+        function switchMode(mode) {
+            currentCheckupType = mode;
+            const quickBtn = document.querySelector('.mode-btn:first-child');
+            const fullBtn = document.querySelector('.mode-btn:last-child');
+            const quickForm = document.getElementById('quickCheckup');
+            const fullForm = document.getElementById('fullCheckup');
+
+            if (mode === 'quick') {
+                quickBtn.classList.add('active');
+                fullBtn.classList.remove('active');
+                quickForm.classList.add('active');
+                fullForm.classList.remove('active');
+            } else {
+                fullBtn.classList.add('active');
+                quickBtn.classList.remove('active');
+                fullForm.classList.add('active');
+                quickForm.classList.remove('active');
+            }
+        }
+
+        // Collect Form Data
+        function collectAllData() {
+            userFormData = {
+                bp: document.getElementById('bp').value || '120/80 mmHg',
+                spo2: document.getElementById('spo2').value || '98%',
+                temp: document.getElementById('temp').value || '37.0°C',
+                hr: document.getElementById('hr').value || '72 bpm',
+                pulse: document.getElementById('pulse').value || '75 bpm',
+                bs: document.getElementById('bs').value || '100 mg/dL',
+                symptoms: document.getElementById('symptoms').value || 'General check-up',
+                type: currentCheckupType
+            };
+
+            if (currentCheckupType === 'quick') {
+                userFormData.feeling = document.getElementById('quickFeeling').value || 'Fine';
+                userFormData.fever = document.getElementById('quickFever').value || 'No';
+                userFormData.energy = document.getElementById('quickEnergy').value || '7';
+            } else {
+                userFormData.duration = document.getElementById('fullDuration').value || 'Recent';
+                userFormData.history = document.getElementById('fullHistory').value || 'No';
+                userFormData.meds = document.getElementById('fullMeds').value || 'None';
+                userFormData.checkupSymptoms = document.getElementById('fullSymptoms').value || 'None';
+                userFormData.tests = document.getElementById('fullTests').value || 'None';
+                userFormData.habits = document.getElementById('fullHabits').value || 'None';
+                userFormData.diet = document.getElementById('fullDiet').value || 'Balanced';
+                userFormData.exercise = document.getElementById('fullExercise').value || 'Moderate';
+            }
+        }
+
+        // Generate Fake Report
+        function generateFakeReport() {
+            const riskLevel = Math.random() > 0.6 ? (Math.random() > 0.5 ? 'LOW' : 'MEDIUM') : 'HIGH';
+            const reportHTML = generateReportHTML(riskLevel);
+            document.getElementById('resultsBox').innerHTML = reportHTML;
+        }
+
+        // Generate Report HTML
+        function generateReportHTML(riskLevel) {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            
+            let riskBadgeClass = 'risk-low';
+            let riskColor = '✅ Low Risk';
+            let recommendations = getLowRiskRecommendations();
+            
+            if (riskLevel === 'MEDIUM') {
+                riskBadgeClass = 'risk-medium';
+                riskColor = '⚠️ Medium Risk';
+                recommendations = getMediumRiskRecommendations();
+            } else if (riskLevel === 'HIGH') {
+                riskBadgeClass = 'risk-high';
+                riskColor = '🔴 High Risk';
+                recommendations = getHighRiskRecommendations();
+            }
+
+            let symptomsHTML = `
+                <div class="report-item">
+                    <div class="report-item-label">Reported Symptoms</div>
+                    <div class="report-item-value">${userFormData.symptoms}</div>
+                </div>
+            `;
+
+            if (userFormData.type === 'quick') {
+                symptomsHTML += `
+                    <div class="report-item">
+                        <div class="report-item-label">Current Feeling</div>
+                        <div class="report-item-value">${userFormData.feeling}</div>
+                    </div>
+                    <div class="report-item">
+                        <div class="report-item-label">Fever/Chest Pain</div>
+                        <div class="report-item-value">${userFormData.fever}</div>
+                    </div>
+                    <div class="report-item">
+                        <div class="report-item-label">Energy Level</div>
+                        <div class="report-item-value">${userFormData.energy}/10</div>
+                    </div>
+                `;
+            } else {
+                symptomsHTML += `
+                    <div class="report-item">
+                        <div class="report-item-label">Symptom Duration</div>
+                        <div class="report-item-value">${userFormData.duration}</div>
+                    </div>
+                    <div class="report-item">
+                        <div class="report-item-label">Medical History</div>
+                        <div class="report-item-value">${userFormData.history}</div>
+                    </div>
+                    <div class="report-item">
+                        <div class="report-item-label">Current Medications</div>
+                        <div class="report-item-value">${userFormData.meds}</div>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="report-container">
+                    <div class="report-header">
+                        <h3>🏥 AI Health Analysis Report</h3>
+                        <p class="report-date">Generated: ${dateStr}</p>
+                    </div>
+
+                    <div class="report-section">
+                        <h4>🔍 Symptoms & Health Information</h4>
+                        ${symptomsHTML}
+                    </div>
+
+                    <div class="report-section">
+                        <h4>⚠️ Risk Assessment</h4>
+                        <div class="risk-badge ${riskBadgeClass}">
+                            ${riskColor}
+                        </div>
+                        <p style="color: #8b949e; margin-top: 1rem;">Based on the analysis of vital signs and reported symptoms, your current health status indicates a ${riskLevel.toLowerCase()} risk level.</p>
+                    </div>
+
+                    <div class="report-section">
+                        <h4>💡 AI Recommendations</h4>
+                        <div class="recommendations">
+                            <h5>Health Guidelines:</h5>
+                            <ul>
+                                ${recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="report-section">
+                        <h4>📝 Summary</h4>
+                        <p style="color: #8b949e; line-height: 1.8;">
+                            This analysis is based on the information you provided. Your vital signs appear to be ${riskLevel === 'LOW' ? 'stable and within normal ranges' : riskLevel === 'MEDIUM' ? 'mostly stable with some areas to monitor' : 'showing signs that require attention'}. 
+                            ${riskLevel === 'LOW' ? 'Continue maintaining your current lifestyle and schedule regular check-ups.' : 'Please consult with a healthcare professional for proper diagnosis and treatment.'}
+                        </p>
+                    </div>
+
+                    ${generateMedicalRecommendationsHTML(riskLevel)}
+
+                    <button class="print-btn" onclick="printReport()">🖨️ Print Report</button>
+                </div>
+            `;
+        }
+
+        // Get Risk-Based Recommendations
+        function getLowRiskRecommendations() {
+            return [
+                "Maintain regular exercise routine (30 mins daily)",
+                "Keep a balanced diet with fruits and vegetables",
+                "Stay hydrated - drink at least 8 glasses of water daily",
+                "Get 7-9 hours of quality sleep every night",
+                "Schedule routine check-ups every 6 months",
+                "Manage stress through meditation or yoga",
+                "Avoid smoking and excessive alcohol consumption"
+            ];
+        }
+
+        function getMediumRiskRecommendations() {
+            return [
+                "Monitor your vital signs daily and keep a health journal",
+                "Increase physical activity gradually to 45 minutes daily",
+                "Reduce salt intake and monitor blood pressure regularly",
+                "Schedule a consultation with your healthcare provider",
+                "Reduce stress and anxiety through relaxation techniques",
+                "Avoid smoking and limit alcohol consumption",
+                "Get regular blood work done (recommended every 3 months)",
+                "Follow a low-fat, high-fiber diet"
+            ];
+        }
+
+        function getHighRiskRecommendations() {
+            return [
+                "🚨 URGENT: Schedule an appointment with your doctor immediately",
+                "Monitor vital signs multiple times daily",
+                "Avoid strenuous activities until cleared by a physician",
+                "Take medications as prescribed if applicable",
+                "Keep an emergency contact list handy",
+                "Maintain detailed health records for your doctor",
+                "Reduce sodium and saturated fat intake significantly",
+                "Consider getting hospitalized for thorough evaluation",
+                "Follow strict bed rest if advised by medical professional",
+                "Seek immediate medical attention if symptoms worsen"
+            ];
+        }
+
+        // Get Medical Recommendations Based on Risk Level
+        function getMedicalRecommendations(riskLevel) {
+            if (riskLevel === 'LOW') {
+                return {
+                    title: '💊 Suggested Supplements & Preventive Care',
+                    items: [
+                        {
+                            name: 'Multivitamin Complex',
+                            dosage: 'One tablet daily with breakfast',
+                            purpose: 'Overall health maintenance and immunity boost'
+                        },
+                        {
+                            name: 'Omega-3 Fatty Acids',
+                            dosage: '1000mg daily',
+                            purpose: 'Heart health and brain function support'
+                        },
+                        {
+                            name: 'Vitamin D3',
+                            dosage: '2000 IU daily',
+                            purpose: 'Bone health and immune system support'
+                        },
+                        {
+                            name: 'Probiotic Supplement',
+                            dosage: 'One capsule daily',
+                            purpose: 'Digestive health and gut microbiome balance'
+                        }
+                    ],
+                    note: '✅ These are general wellness supplements. Consult your doctor before starting any new supplement regimen.'
+                };
+            } else if (riskLevel === 'MEDIUM') {
+                return {
+                    title: '🏥 Nearby Healthcare Providers',
+                    items: [
+                        {
+                            name: 'Dr. Rajesh Kumar - General Physician',
+                            location: 'Apollo Clinic, Sadar Bazaar, Agra',
+                            contact: '+91 98765 43210',
+                            distance: '2.5 km away',
+                            availability: 'Mon-Sat: 9:00 AM - 6:00 PM'
+                        },
+                        {
+                            name: 'Dr. Priya Sharma - Internal Medicine',
+                            location: 'City Hospital, Sanjay Place, Agra',
+                            contact: '+91 98765 43211',
+                            distance: '3.8 km away',
+                            availability: 'Mon-Fri: 10:00 AM - 7:00 PM'
+                        },
+                        {
+                            name: 'Dr. Amit Verma - Family Medicine',
+                            location: 'HealthCare Plus, MG Road, Agra',
+                            contact: '+91 98765 43212',
+                            distance: '1.9 km away',
+                            availability: 'Daily: 8:00 AM - 8:00 PM'
+                        },
+                        {
+                            name: 'Dr. Neha Gupta - General Practitioner',
+                            location: 'Fortis Clinic, Tajganj, Agra',
+                            contact: '+91 98765 43213',
+                            distance: '4.2 km away',
+                            availability: 'Mon-Sat: 11:00 AM - 5:00 PM'
+                        }
+                    ],
+                    note: '⚠️ Please schedule an appointment soon. Early consultation can prevent complications.'
+                };
+            } else {
+                return {
+                    title: '🚨 Recommended Specialist Doctors - URGENT',
+                    items: [
+                        {
+                            name: 'Dr. Suresh Patel - Cardiologist (MBBS, MD, DM)',
+                            location: 'S.N. Medical College & Hospital, Agra',
+                            contact: '+91 98765 43220 | Emergency: 108',
+                            specialization: 'Heart & Cardiovascular Diseases',
+                            experience: '20+ years',
+                            rating: '⭐⭐⭐⭐⭐ (4.9/5)',
+                            availability: '24/7 Emergency Available'
+                        },
+                        {
+                            name: 'Dr. Meera Singh - Pulmonologist (MBBS, MD)',
+                            location: 'District Hospital, Agra Cantt',
+                            contact: '+91 98765 43221',
+                            specialization: 'Respiratory & Lung Disorders',
+                            experience: '15+ years',
+                            rating: '⭐⭐⭐⭐⭐ (4.8/5)',
+                            availability: 'Daily: 9:00 AM - 9:00 PM'
+                        },
+                        {
+                            name: 'Dr. Anil Mehta - Endocrinologist (MBBS, MD, DM)',
+                            location: 'Apollo Spectra Hospital, Agra',
+                            contact: '+91 98765 43222',
+                            specialization: 'Diabetes & Hormonal Disorders',
+                            experience: '18+ years',
+                            rating: '⭐⭐⭐⭐⭐ (4.9/5)',
+                            availability: 'Mon-Sat: 10:00 AM - 6:00 PM'
+                        },
+                        {
+                            name: 'Dr. Kavita Reddy - Critical Care Specialist',
+                            location: 'Max Hospital, Sanjay Place, Agra',
+                            contact: '+91 98765 43223 | ICU: 102',
+                            specialization: 'Emergency & Critical Care',
+                            experience: '12+ years',
+                            rating: '⭐⭐⭐⭐⭐ (4.7/5)',
+                            availability: '24/7 Emergency & ICU Services'
+                        }
+                    ],
+                    note: '🚨 HIGH PRIORITY: Contact these specialists immediately. Do not delay medical attention.'
+                };
+            }
+        }
+
+        // Generate Medical Recommendations HTML
+        function generateMedicalRecommendationsHTML(riskLevel) {
+            const medRec = getMedicalRecommendations(riskLevel);
+            
+            let urgentBanner = '';
+            if (riskLevel === 'HIGH') {
+                urgentBanner = `
+                    <div class="urgent-banner">
+                        <p>⚠️ URGENT MEDICAL ATTENTION REQUIRED ⚠️</p>
+                    </div>
+                `;
+            }
+
+            let itemsHTML = '';
+            
+            if (riskLevel === 'LOW') {
+                itemsHTML = medRec.items.map(item => `
+                    <div class="medical-item">
+                        <div class="medical-item-header">💊 ${item.name}</div>
+                        <div class="medical-item-detail"><strong>Dosage:</strong> ${item.dosage}</div>
+                        <div class="medical-item-detail"><strong>Purpose:</strong> ${item.purpose}</div>
+                    </div>
+                `).join('');
+            } else if (riskLevel === 'MEDIUM') {
+                itemsHTML = medRec.items.map(item => `
+                    <div class="medical-item">
+                        <div class="medical-item-header">👨‍⚕️ ${item.name}</div>
+                        <div class="medical-item-detail"><strong>📍 Location:</strong> ${item.location}</div>
+                        <div class="medical-item-detail"><strong>📞 Contact:</strong> ${item.contact}</div>
+                        <div class="medical-item-detail"><strong>🚗 Distance:</strong> ${item.distance}</div>
+                        <div class="medical-item-detail"><strong>🕐 Available:</strong> ${item.availability}</div>
+                    </div>
+                `).join('');
+            } else {
+                itemsHTML = medRec.items.map(item => `
+                    <div class="medical-item">
+                        <div class="medical-item-header">🩺 ${item.name}</div>
+                        <div class="medical-item-detail"><strong>📍 Location:</strong> ${item.location}</div>
+                        <div class="medical-item-detail"><strong>📞 Contact:</strong> ${item.contact}</div>
+                        <div class="medical-item-detail"><strong>🎯 Specialization:</strong> ${item.specialization}</div>
+                        <div class="medical-item-detail"><strong>⏱️ Experience:</strong> ${item.experience}</div>
+                        <div class="medical-item-detail"><strong>⭐ Rating:</strong> ${item.rating}</div>
+                        <div class="medical-item-detail"><strong>🕐 Available:</strong> ${item.availability}</div>
+                    </div>
+                `).join('');
+            }
+
+            return `
+                <div class="medical-recommendations">
+                    ${urgentBanner}
+                    <h4>${medRec.title}</h4>
+                    ${itemsHTML}
+                    <div class="medical-note">
+                        ${medRec.note}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Print Report
+        function printReport() {
+            window.print();
+        }
+
+        // Submit Checkup
+        function submitCheckup(type) {
+            const hasData = type === 'quick' 
+                ? document.getElementById('quickFeeling').value 
+                : document.getElementById('fullDuration').value;
+            
+            if (!hasData) {
+                alert('Please fill in the required fields!');
+                return;
+            }
+
+            showLoading();
+            setTimeout(() => {
+                hideLoading();
+                currentCheckupType = type;
+                collectAllData();
+                generateFakeReport();
+            }, 3000);
+        }
+
+        // Loading Animation
+        function showLoading() {
+            document.getElementById('loadingAnimation').classList.add('active');
+            document.getElementById('resultsBox').innerHTML = '<p style="text-align: center; color: #8b949e;">Analyzing your data...</p>';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingAnimation').classList.remove('active');
+        }
+    </script>
+</body>
+</html>

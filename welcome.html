@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bharat Care AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+
+        /* Splash Page */
+        #splashPage {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            opacity: 1;
+            transition: opacity 0.5s ease-out;
+        }
+
+        #splashPage.fade-out {
+            opacity: 0;
+            pointer-events: none;
+            display: none;
+        }
+
+        #splashPage * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Inter", sans-serif;
+        }
+
+        #splashPage {
+            height: 100vh;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #010103;
+            position: relative;
+        }
+
+        #splashPage .overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.55);
+            z-index: 1;
+        }
+
+        #splashPage .content {
+            text-shadow: 20px 0px 20px #6d7ecfbd;
+            position: relative;
+            z-index: 5;
+            display: flex;
+            margin-left: -125px;
+            margin-top: -90px;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        #splashPage .title {
+            color: #ffffff;
+            font-size: 2.5rem;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.55s ease-out;
+        }
+
+        #splashPage .tagline {
+            color: #f1e9c8;
+            font-size: 1rem;
+            margin-top: 10px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.55s ease-out;
+            transition-delay: 0.2s;
+        }
+
+        #splashPage .map {
+            position: absolute;
+            animation: zoomin 2s forwards;
+        }
+
+        @keyframes zoomin {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.5); }
+        }
+
+        /* Main Page */
+        #mainPage {
+            opacity: 0;
+            transition: opacity 0.5s ease-out;
+            z-index: 10;
+        }
+
+        #mainPage.show {
+            opacity: 1;
+        }
+
+        /* Animated background particles */
+        .particles {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(59, 130, 246, 0.3);
+            border-radius: 50%;
+            animation: float 20s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.5;
+            }
+            90% {
+                opacity: 0.5;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(50px);
+                opacity: 0;
+            }
+        }
+
+        /* Header */
+        header {
+            position: relative;
+            padding: 1.5rem 2rem;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #60a5fa 0%, #34d399 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            text-align: center;
+            padding: 5rem 2rem 4rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            z-index: 10;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 50px;
+            color: #60a5fa;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 2rem;
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #ffffff 0%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeIn 1s ease-out 0.2s both;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: #94a3b8;
+            line-height: 1.8;
+            max-width: 700px;
+            margin: 0 auto 3rem;
+            animation: fadeIn 1s ease-out 0.4s both;
+        }
+
+        /* CTA Button */
+        .cta-container {
+            animation: fadeIn 1s ease-out 0.6s both;
+            margin-bottom: 4rem;
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1.25rem 3rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(59, 130, 246, 0.4);
+        }
+
+        .arrow {
+            font-size: 1.3rem;
+            transition: transform 0.3s ease;
+        }
+
+        .cta-button:hover .arrow {
+            transform: translateX(5px);
+        }
+
+        /* Features Section */
+        .features {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            z-index: 10;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            padding: 2.5rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            animation: fadeIn 1s ease-out both;
+        }
+
+        .feature-card:nth-child(1) { animation-delay: 0.8s; }
+        .feature-card:nth-child(2) { animation-delay: 1s; }
+        .feature-card:nth-child(3) { animation-delay: 1.2s; }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(59, 130, 246, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.4rem;
+            color: #e2e8f0;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card p {
+            color: #94a3b8;
+            line-height: 1.7;
+            font-size: 1rem;
+        }
+
+        /* Disclaimer Section */
+        .disclaimer {
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto 4rem;
+            padding: 2rem;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            animation: fadeIn 1s ease-out 1.4s both;
+            z-index: 10;
+        }
+
+        .disclaimer-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .warning-icon {
+            font-size: 2rem;
+        }
+
+        .disclaimer h3 {
+            color: #fca5a5;
+            font-size: 1.3rem;
+        }
+
+        .disclaimer p {
+            color: #cbd5e1;
+            line-height: 1.8;
+            font-size: 1rem;
+        }
+
+        /* Footer */
+        footer {
+            position: relative;
+            text-align: center;
+            padding: 2rem;
+            color: #64748b;
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 10;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .subtitle {
+                font-size: 1.1rem;
+            }
+
+            .hero {
+                padding: 3rem 1.5rem 2rem;
+            }
+
+            .features {
+                padding: 2rem 1.5rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cta-button {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- SPLASH PAGE - ORIGINAL CODE -->
+    <div id="splashPage">
+        <img class="map" src="image4.png" height="71%">
+        <div class="overlay"></div>
+        <div class="content">
+            <h1 class="title">Bharat Care AI</h1>
+            <p class="tagline">"Your partner in everyday health awareness"</p>
+        </div>
+    </div>
+
+    <!-- MAIN PAGE -->
+    <div id="mainPage">
+        <div class="particles" id="particles"></div>
+
+        <header>
+            <div class="logo">🏥 Bharat Care AI</div>
+        </header>
+
+        <section class="hero">
+            <div class="hero-badge">✨ Powered by Advanced AI Technology</div>
+            <h1>"AI That Cares-Smarter,Faster Disease Detection</h1>
+            <p class="subtitle">
+                "Our intelligent system analyzes your symptoms and provides accurate insights within seconds."
+            </p>
+            <div class="cta-container">
+                <a href="home.html" class="cta-button">
+                    <span>Start With AI Care</span>
+                    <span class="arrow">→</span>
+                </a>
+            </div>
+        </section>
+
+
+        <footer>
+            <p>&copy; 2025 Bharat Care AI. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Create particles for main page
+        const particlesContainer = document.getElementById('particles');
+        const particleCount = 30;
+
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 20 + 's';
+            particle.style.animationDuration = (Math.random() * 10 + 15) + 's';
+            particlesContainer.appendChild(particle);
+        }
+
+        // Original splash page animations
+        window.onload = () => {
+            document.body.classList.add("start-zoom");
+            
+            // Title fade-in
+            setTimeout(() => {
+                document.querySelector(".title").style.opacity = "1";
+                document.querySelector(".title").style.transform = "translateY(0)";
+            }, 1600);
+            
+            // Tagline fade-in
+            setTimeout(() => {
+                document.querySelector(".tagline").style.opacity = "1";
+                document.querySelector(".tagline").style.transform = "translateY(0)";
+            }, 1900);
+
+            // Transition to main page after 5 seconds
+            setTimeout(() => {
+                const splashPage = document.getElementById('splashPage');
+                const mainPage = document.getElementById('mainPage');
+                
+                splashPage.classList.add('fade-out');
+                setTimeout(() => {
+                    mainPage.classList.add('show');
+                }, 500);
+            }, 5000);
+        };
+    </script>
+</body>
+</html>
